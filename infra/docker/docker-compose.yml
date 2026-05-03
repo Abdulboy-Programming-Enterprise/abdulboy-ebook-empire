@@ -1,0 +1,309 @@
+# =============================================================================
+# ABDULBOY EBOOK EMPIRE - DOCKER COMPOSE (Development)
+# =============================================================================
+# Complete development environment with all services
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database (Primary)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: abdulboy-ebook-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-abdulboy_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_123}
+      POSTGRES_DB: ${DB_NAME:-abdulboy_ebook_empire}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ../../database/functions.sql:/docker-entrypoint-initdb.d/02-functions.sql
+      - ../../database/triggers.sql:/docker-entrypoint-initdb.d/03-triggers.sql
+      - ../../database/indexes.sql:/docker-entrypoint-initdb.d/04-indexes.sql
+    networks:
+      - ebook-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-abdulboy_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Read Replica (for scaling)
+  # ---------------------------------------------------------------------------
+  postgres-replica:
+    image: postgres:15-alpine
+    container_name: abdulboy-ebook-postgres-replica
+    environment:
+      POSTGRES_USER: ${DB_USER:-abdulboy_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_123}
+      POSTGRES_DB: ${DB_NAME:-abdulboy_ebook_empire}
+    ports:
+      - "5433:5432"
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MongoDB (Analytics & Logs)
+  # ---------------------------------------------------------------------------
+  mongodb:
+    image: mongo:6
+    container_name: abdulboy-ebook-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-abdulboy_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-secure_mongo_123}
+      MONGO_INITDB_DATABASE: ${MONGODB_DB:-abdulboy_analytics}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - ebook-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Redis (Cache & Sessions)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: abdulboy-ebook-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secure_redis_123}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ebook-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-secure_redis_123}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Redis Insight (GUI for Redis)
+  # ---------------------------------------------------------------------------
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: abdulboy-ebook-redis-insight
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_data:/db
+    networks:
+      - ebook-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Backend API (FastAPI)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.dev
+    container_name: abdulboy-ebook-api
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-abdulboy_admin}:${DB_PASSWORD:-secure_password_123}@postgres:5432/${DB_NAME:-abdulboy_ebook_empire}
+      MONGODB_URI: mongodb://${MONGODB_USER:-abdulboy_admin}:${MONGODB_PASSWORD:-secure_mongo_123}@mongodb:27017
+      REDIS_URL: redis://:${REDIS_PASSWORD:-secure_redis_123}@redis:6379/0
+      APP_ENV: development
+      API_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+      - "5678:5678"  # Debugger port
+    volumes:
+      - ../../apps/api:/app
+      - ../../storage:/app/storage
+      - /app/__pycache__
+    networks:
+      - ebook-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Worker (Celery for background tasks)
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.dev
+    container_name: abdulboy-ebook-worker
+    command: celery -A app.tasks worker --loglevel=info --concurrency=4
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-abdulboy_admin}:${DB_PASSWORD:-secure_password_123}@postgres:5432/${DB_NAME:-abdulboy_ebook_empire}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-secure_redis_123}@redis:6379/0
+      APP_ENV: development
+    volumes:
+      - ../../apps/api:/app
+      - ../../storage:/app/storage
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres
+      - redis
+      - api
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Nginx (Reverse Proxy & Static Files)
+  # ---------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.nginx
+    container_name: abdulboy-ebook-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../../apps/web:/usr/share/nginx/html
+      - ../../storage/uploads:/usr/share/nginx/uploads
+    networks:
+      - ebook-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # PgAdmin (PostgreSQL GUI)
+  # ---------------------------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: abdulboy-ebook-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@abdulboy-ebook.com
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-pgadmin_secure_123}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Mongo Express (MongoDB GUI)
+  # ---------------------------------------------------------------------------
+  mongo-express:
+    image: mongo-express:latest
+    container_name: abdulboy-ebook-mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_USER:-abdulboy_admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD:-secure_mongo_123}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGODB_USER:-abdulboy_admin}:${MONGODB_PASSWORD:-secure_mongo_123}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-mongo_express_123}
+    ports:
+      - "8081:8081"
+    networks:
+      - ebook-network
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MailHog (Email Testing)
+  # ---------------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: abdulboy-ebook-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - ebook-network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MinIO (S3 Compatible Storage for development)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: abdulboy-ebook-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - ebook-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Create Buckets for MinIO
+  # ---------------------------------------------------------------------------
+  minio-create-buckets:
+    image: minio/mc:latest
+    container_name: abdulboy-ebook-minio-setup
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin123};
+      mc mb local/abdulboy-ebook-books || true;
+      mc mb local/abdulboy-ebook-avatars || true;
+      mc mb local/abdulboy-ebook-backups || true;
+      mc policy set public local/abdulboy-ebook-books;
+      exit 0;
+      "
+    networks:
+      - ebook-network
+
+# ---------------------------------------------------------------------------
+# Networks
+# ---------------------------------------------------------------------------
+networks:
+  ebook-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ---------------------------------------------------------------------------
+# Volumes
+# ---------------------------------------------------------------------------
+volumes:
+  postgres_data:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  redis_insight_data:
+  pgadmin_data:
+  minio_data:
