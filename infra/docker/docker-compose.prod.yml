@@ -1,0 +1,190 @@
+# =============================================================================
+# ABDULBOY EBOOK EMPIRE - PRODUCTION DOCKER COMPOSE
+# =============================================================================
+# Optimized for production deployment with scaling
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL with replication
+  # ---------------------------------------------------------------------------
+  postgres-primary:
+    image: postgres:15-alpine
+    container_name: abdulboy-ebook-postgres-primary
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_REPLICATION_MODE: primary
+      POSTGRES_REPLICATION_USER: replica_user
+      POSTGRES_REPLICATION_PASSWORD: ${REPLICA_PASSWORD}
+    volumes:
+      - postgres_primary_data:/var/lib/postgresql/data
+    networks:
+      - ebook-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'
+        reservations:
+          memory: 2G
+          cpus: '1'
+
+  postgres-replica:
+    image: postgres:15-alpine
+    container_name: abdulboy-ebook-postgres-replica
+    environment:
+      POSTGRES_REPLICATION_MODE: replica
+      POSTGRES_MASTER_HOST: postgres-primary
+      POSTGRES_REPLICATION_USER: replica_user
+      POSTGRES_REPLICATION_PASSWORD: ${REPLICA_PASSWORD}
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres-primary
+    restart: always
+    deploy:
+      replicas: 2
+
+  # ---------------------------------------------------------------------------
+  # Redis Cluster
+  # ---------------------------------------------------------------------------
+  redis-primary:
+    image: redis:7-alpine
+    container_name: abdulboy-ebook-redis-primary
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_primary_data:/data
+    networks:
+      - ebook-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  redis-replica:
+    image: redis:7-alpine
+    container_name: abdulboy-ebook-redis-replica
+    command: redis-server --slaveof redis-primary 6379 --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_replica_data:/data
+    networks:
+      - ebook-network
+    depends_on:
+      - redis-primary
+    restart: always
+    deploy:
+      replicas: 2
+
+  # ---------------------------------------------------------------------------
+  # Backend API (Scaled)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+    container_name: abdulboy-ebook-api
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres-primary:5432/${DB_NAME}
+      DATABASE_REPLICA_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres-replica:5432/${DB_NAME}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis-primary:6379/0
+      APP_ENV: production
+      SENTRY_DSN: ${SENTRY_DSN}
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres-primary
+      - redis-primary
+    restart: always
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+
+  # ---------------------------------------------------------------------------
+  # Worker (Background Tasks)
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+    command: celery -A app.tasks worker --loglevel=info --concurrency=4
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres-primary:5432/${DB_NAME}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis-primary:6379/0
+      APP_ENV: production
+    networks:
+      - ebook-network
+    depends_on:
+      - postgres-primary
+      - redis-primary
+      - api
+    restart: always
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 768M
+          cpus: '0.5'
+
+  # ---------------------------------------------------------------------------
+  # Nginx Load Balancer
+  # ---------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.nginx
+    container_name: abdulboy-ebook-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../../apps/web/dist:/usr/share/nginx/html
+      - ../../storage/uploads:/usr/share/nginx/uploads
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - ebook-network
+    depends_on:
+      - api
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+# ---------------------------------------------------------------------------
+# Networks
+# ---------------------------------------------------------------------------
+networks:
+  ebook-network:
+    driver: overlay
+    attachable: true
+
+# ---------------------------------------------------------------------------
+# Volumes
+# ---------------------------------------------------------------------------
+volumes:
+  postgres_primary_data:
+  postgres_replica_data:
+  redis_primary_data:
+  redis_replica_data:
