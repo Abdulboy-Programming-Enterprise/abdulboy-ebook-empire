@@ -1,0 +1,267 @@
+# =============================================================================
+# ABDULBOY EBOOK EMPIRE - GIT IGNORE
+# =============================================================================
+
+# -------------------------------
+# Operating System Files
+# -------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+.desktop.ini
+$RECYCLE.BIN/
+
+# -------------------------------
+# IDE / Editor Files
+# -------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+*.iml
+*.ipr
+*.iws
+.vertx/
+.cursor/
+.codespaces/
+
+# -------------------------------
+# Dependencies
+# -------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnpm-store/
+.pnp/
+.pnp.js
+.pnp.cjs
+.yarn/
+.venv/
+venv/
+ENV/
+env/
+.env.local
+.env.*.local
+
+# -------------------------------
+# Python
+# -------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+.coveragerc
+htmlcov/
+.tox/
+.hypothesis/
+.direnv/
+.venv/
+venv.bak/
+.vsenv/
+
+# -------------------------------
+# Python - Poetry
+# -------------------------------
+poetry.lock
+poetry.toml
+
+# -------------------------------
+# Python - Celery
+# -------------------------------
+celerybeat-schedule
+celerybeat.pid
+*.pid
+
+# -------------------------------
+# Production Builds
+# -------------------------------
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+*.tsbuildinfo
+
+# -------------------------------
+# Environment & Secrets
+# -------------------------------
+.env
+.env.production
+.env.development
+.env.test
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.secret
+*.secrets
+secrets/
+credentials.json
+service-account.json
+
+# -------------------------------
+# Database
+# -------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.backup
+*.sql.gz
+*.sql.bz2
+*.sql.xz
+database/backups/
+storage/backups/
+
+# -------------------------------
+# Uploads & Media
+# -------------------------------
+storage/uploads/
+storage/data/
+uploads/
+media/
+*.pdf
+*.epub
+*.mobi
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.webm
+
+# Except placeholder files
+!**/.gitkeep
+!**/placeholder.*
+!**/sample.*
+!**/example.*
+
+# -------------------------------
+# Logs
+# -------------------------------
+*.log
+logs/
+*.log.*
+*.log.gz
+*.log.zip
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# -------------------------------
+# Testing
+# -------------------------------
+.coverage
+.coverage.*
+.nyc_output/
+coverage/
+lcov.info
+.jest/
+test-results/
+playwright-report/
+testem.log
+*.test.js
+*.spec.js
+
+# -------------------------------
+# Docker
+# -------------------------------
+docker-compose.override.yml
+docker-compose.*.override.yml
+.ecr/
+*.tar.gz
+*.tar
+*.tgz
+
+# -------------------------------
+# Kubernetes
+# -------------------------------
+*.secret.yaml
+*.secrets.yaml
+secrets.local.yaml
+
+# -------------------------------
+# Terraform
+# -------------------------------
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# -------------------------------
+# Miscellaneous
+# -------------------------------
+*.tmp
+*.temp
+*.cache
+.cache/
+.tmp/
+.temp/
+.vercel/
+.netlify/
+.svelte-kit/
+.rollup.cache/
+*.zip
+*.rar
+*.7z
+*.bak
+*.old
+*.orig
+*.rej
+
+# -------------------------------
+# Project Specific
+# -------------------------------
+.ipynb_checkpoints/
+ml-models/*.pkl
+!ml-models/.gitkeep
+!ml-models/example.pkl
