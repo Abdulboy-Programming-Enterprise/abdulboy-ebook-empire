@@ -1,0 +1,37 @@
+# =============================================================================
+# ABDULBOY EBOOK EMPIRE - NGINX DOCKERFILE
+# =============================================================================
+# Reverse proxy with SSL/TLS termination and static file serving
+# =============================================================================
+
+FROM nginx:1.25-alpine AS nginx
+
+# Install tools for health checks
+RUN apk add --no-cache curl
+
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy custom nginx configuration
+COPY infra/docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+# Copy site configuration
+COPY infra/docker/nginx/sites/default.conf /etc/nginx/conf.d/default.conf
+
+# Create SSL directory
+RUN mkdir -p /etc/nginx/ssl
+
+# Copy static files
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+
+# Copy health check script
+COPY infra/docker/nginx/healthcheck.sh /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh
+
+EXPOSE 80 443
+
+CMD ["nginx", "-g", "daemon off;"]
