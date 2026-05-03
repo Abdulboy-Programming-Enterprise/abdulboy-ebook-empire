@@ -1,0 +1,102 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    ".env",
+    "tsconfig.json",
+    "package.json"
+  ],
+  "globalEnv": [
+    "APP_ENV",
+    "APP_DEBUG",
+    "APP_SECRET_KEY",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "STRIPE_PUBLIC_KEY",
+    "STRIPE_SECRET_KEY",
+    "OPAY_MERCHANT_ID",
+    "OPAY_SECRET_KEY",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "OPENAI_API_KEY"
+  ],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        "build/**",
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV"]
+    },
+    "test:unit": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["build"],
+      "outputs": ["test-results/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["playwright-report/**", "test-results/**"]
+    },
+    "test:coverage": {
+      "dependsOn": ["test:unit", "test:integration"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "lint:fix": {
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "cache": false,
+      "dependsOn": ["db:migrate"],
+      "env": ["DATABASE_URL"]
+    },
+    "db:reset": {
+      "cache": false,
+      "dependsOn": ["db:migrate", "db:seed"]
+    },
+    "deploy:staging": {
+      "cache": false,
+      "dependsOn": ["build", "test"],
+      "env": ["DEPLOY_TOKEN", "STAGING_URL"]
+    },
+    "deploy:production": {
+      "cache": false,
+      "dependsOn": ["build", "test"],
+      "env": ["DEPLOY_TOKEN", "PRODUCTION_URL"]
+    },
+    "prebuild": {
+      "cache": false
+    }
+  }
+}
