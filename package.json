@@ -1,0 +1,104 @@
+{
+  "name": "abdulboy-ebook-empire",
+  "version": "1.0.0",
+  "description": "World-class enterprise ebook platform with AI recommendations, multi-payment gateway integration, PWA support, and full DevOps infrastructure",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@abdulboy/web",
+    "dev:api": "turbo dev --filter=@abdulboy/api",
+    "dev:worker": "turbo dev --filter=@abdulboy/worker",
+    "build": "turbo build",
+    "build:web": "turbo build --filter=@abdulboy/web",
+    "build:api": "turbo build --filter=@abdulboy/api",
+    "build:all": "turbo build",
+    "start": "turbo start",
+    "start:web": "turbo start --filter=@abdulboy/web",
+    "start:api": "turbo start --filter=@abdulboy/api",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
+    "test:coverage": "turbo test:coverage",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,html,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,html,yml,yaml}\"",
+    "type-check": "turbo type-check",
+    "clean": "turbo clean && rm -rf node_modules",
+    "db:migrate": "turbo db:migrate",
+    "db:seed": "turbo db:seed",
+    "db:reset": "turbo db:reset",
+    "docker:up": "docker-compose -f infra/docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f infra/docker/docker-compose.yml down",
+    "docker:logs": "docker-compose -f infra/docker/docker-compose.yml logs -f",
+    "docker:build": "docker-compose -f infra/docker/docker-compose.yml build",
+    "k8s:apply": "kubectl apply -f infra/kubernetes/",
+    "k8s:delete": "kubectl delete -f infra/kubernetes/",
+    "prepare": "husky install",
+    "release": "standard-version",
+    "release:major": "standard-version --release-as major",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
+    "deploy:staging": "turbo deploy:staging",
+    "deploy:production": "turbo deploy:production",
+    "monitoring:up": "docker-compose -f infra/monitoring/docker-compose.yml up -d",
+    "monitoring:down": "docker-compose -f infra/monitoring/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "prettier": "^3.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
+    "standard-version": "^9.5.0",
+    "concurrently": "^8.0.0"
+  },
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,jsonc,md,mdx,css,scss,html,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{py}": [
+      "black --fix",
+      "isort --fix"
+    ]
+  },
+  "keywords": [
+    "ebook",
+    "ebook-platform",
+    "pwa",
+    "ai-recommendations",
+    "payment-gateway",
+    "stripe",
+    "opay",
+    "flutterwave",
+    "subscription",
+    "watermarking",
+    "gamification"
+  ],
+  "author": "Abdulrahman Adeeyo (Abdulboy)",
+  "license": "Proprietary",
+  "copyright": "2026 Abdulboy Programming Enterprise",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abdulboy/abdulboy-ebook-empire.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abdulboy/abdulboy-ebook-empire/issues"
+  },
+  "homepage": "https://abdulboy-ebook.com"
+}
