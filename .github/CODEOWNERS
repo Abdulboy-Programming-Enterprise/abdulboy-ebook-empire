@@ -1,0 +1,86 @@
+# =============================================================================
+# CODEOWNERS - Define who owns which parts of the codebase
+# =============================================================================
+# These owners will be automatically requested for review when a PR
+# modifies code in their respective directories.
+# =============================================================================
+
+# Global owners (entire repository)
+* @abdulboy/engineering-leads @abdulboy/security-team
+
+# Backend API ownership
+/apps/api/ @abdulboy/backend-team @abdulboy/api-specialists
+/apps/api/app/api/ @abdulboy/api-specialists
+/apps/api/app/core/ @abdulboy/backend-architects
+/apps/api/app/models/ @abdulboy/database-team
+/apps/api/app/services/ @abdulboy/backend-team
+
+# Frontend ownership
+/apps/web/ @abdulboy/frontend-team @abdulboy/ui-ux
+/apps/web/public/ @abdulboy/frontend-team
+/apps/web/components/ @abdulboy/ui-ux
+/apps/web/styles/ @abdulboy/css-specialists
+/apps/web/scripts/ @abdulboy/javascript-experts
+
+# Admin panel ownership
+/apps/admin/ @abdulboy/admin-team @abdulboy/frontend-team
+
+# Worker & background tasks
+/apps/worker/ @abdulboy/backend-team @abdulboy/devops-team
+
+# Shared packages
+/packages/ui/ @abdulboy/ui-ux @abdulboy/frontend-team
+/packages/utils/ @abdulboy/shared-libs
+/packages/config/ @abdulboy/engineering-leads
+/packages/types/ @abdulboy/typescript-experts
+/packages/payments/ @abdulboy/payment-team @abdulboy/security-team
+
+# Business services
+/services/auth/ @abdulboy/security-team @abdulboy/backend-team
+/services/users/ @abdulboy/backend-team
+/services/books/ @abdulboy/ebook-specialists
+/services/payments/ @abdulboy/payment-team @abdulboy/security-team
+/services/subscriptions/ @abdulboy/product-team
+/services/analytics/ @abdulboy/data-team
+/services/ai/ @abdulboy/ml-engineers
+/services/notifications/ @abdulboy/backend-team
+/services/watermarking/ @abdulboy/security-team @abdulboy/ebook-specialists
+/services/optimization/ @abdulboy/performance-team
+/services/gamification/ @abdulboy/product-team
+
+# Infrastructure
+/infra/docker/ @abdulboy/devops-team
+/infra/kubernetes/ @abdulboy/devops-team @abdulboy/sre-team
+/infra/monitoring/ @abdulboy/sre-team
+/infra/terraform/ @abdulboy/devops-team @abdulboy/aws-experts
+
+# Database
+/database/ @abdulboy/database-team @abdulboy/backend-architects
+/database/migrations/ @abdulboy/database-team
+/database/seeds/ @abdulboy/qa-team
+
+# Tests
+/tests/ @abdulboy/qa-team @abdulboy/engineering-leads
+/tests/security/ @abdulboy/security-team
+/tests/performance/ @abdulboy/performance-team
+
+# Documentation
+/docs/ @abdulboy/tech-writers @abdulboy/engineering-leads
+/README.md @abdulboy/product-team @abdulboy/engineering-leads
+
+# Security critical files
+/SECURITY.md @abdulboy/security-team @abdulboy/legal-team
+/.env* @abdulboy/security-team @abdulboy/devops-team
+/configs/payment-providers.json @abdulboy/payment-team @abdulboy/security-team
+/configs/stripe/ @abdulboy/payment-team @abdulboy/security-team
+/configs/opay/ @abdulboy/payment-team @abdulboy/security-team
+
+# CI/CD & Automation
+/.github/workflows/ @abdulboy/devops-team @abdulboy/engineering-leads
+/scripts/ @abdulboy/devops-team
+/Makefile @abdulboy/engineering-leads
+
+# Root configuration files
+/package.json @abdulboy/engineering-leads
+/turbo.json @abdulboy/engineering-leads
+/pnpm-workspace.yaml @abdulboy/engineering-leads
