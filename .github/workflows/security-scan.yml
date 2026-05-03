@@ -1,0 +1,206 @@
+name: Security Scan
+
+on:
+  schedule:
+    # Run daily at 2 AM
+    - cron: '0 2 * * *'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.py'
+      - '**.js'
+      - '**.html'
+      - 'requirements/*.txt'
+      - 'package.json'
+  workflow_dispatch:
+
+env:
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+jobs:
+  # SAST (Static Application Security Testing)
+  sast:
+    name: SAST - Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python, javascript
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Run Bandit (Python)
+        run: |
+          pip install bandit
+          bandit -r apps/api -f json -o bandit-report.json
+        continue-on-error: true
+
+      - name: Run ESLint security rules
+        run: |
+          cd apps/web
+          npx eslint . --ext .js --rule 'security/detect-object-injection: error'
+        continue-on-error: true
+
+  # Dependency scanning
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Snyk scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Run Python dependency scan
+        run: |
+          pip install safety
+          cd apps/api
+          safety check -r requirements/base.txt --full-report
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate
+
+      - name: Check for outdated dependencies
+        run: |
+          pnpm outdated --format=json
+
+  # Container scanning
+  container-scan:
+    name: Container Image Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t abdulboy-ebook-api:test ./apps/api
+          docker build -t abdulboy-ebook-web:test ./apps/web
+
+      - name: Scan API image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: abdulboy-ebook-api:test
+          format: 'sarif'
+          output: 'trivy-api.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Scan Web image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: abdulboy-ebook-web:test
+          format: 'sarif'
+          output: 'trivy-web.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-*.sarif'
+
+      - name: Run Docker Scout
+        uses: docker/scout-action@v1
+        with:
+          command: quickview
+          image: abdulboy-ebook-api:test
+
+  # Secret scanning
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Infrastructure scanning
+  infra-scan:
+    name: Infrastructure Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov on Terraform
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infra/terraform
+          framework: terraform
+          output_format: cli
+          soft_fail: false
+
+      - name: Run KubeSec on Kubernetes manifests
+        uses: controlplaneio/kubesec-action@v2
+        with:
+          input: infra/kubernetes/
+
+      - name: Validate Kubernetes security policies
+        run: |
+          # Install kube-score
+          curl -L https://github.com/zegl/kube-score/releases/download/v1.19.0/kube-score_1.19.0_linux_amd64.tar.gz | tar xz
+          ./kube-score score infra/kubernetes/*.yaml
+
+  # Report
+  report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [sast, dependency-scan, container-scan, secret-scan, infra-scan]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🔒 Security Scan Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST (CodeQL) | ${{ needs.sast.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Container Scan | ${{ needs.container-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scan | ${{ needs.secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Infrastructure Scan | ${{ needs.infra-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send alert on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24
+        with:
+          payload: |
+            {
+              "text": "⚠️ Security scan failed!",
+              "blocks": [{
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Security Alert*: One or more security scans failed.\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                }
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SECURITY_SLACK_WEBHOOK }}
