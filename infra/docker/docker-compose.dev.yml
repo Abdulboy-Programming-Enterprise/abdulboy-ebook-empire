@@ -1,0 +1,134 @@
+# =============================================================================
+# ABDULBOY EBOOK EMPIRE - DEVELOPMENT DOCKER COMPOSE (Extended)
+# =============================================================================
+# Additional development tools and services
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Elasticsearch (Search & Analytics)
+  # ---------------------------------------------------------------------------
+  elasticsearch:
+    image: elasticsearch:8.8.0
+    container_name: abdulboy-ebook-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - ebook-network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Kibana (Elasticsearch Dashboard)
+  # ---------------------------------------------------------------------------
+  kibana:
+    image: kibana:8.8.0
+    container_name: abdulboy-ebook-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - ebook-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Prometheus (Metrics Collection)
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: abdulboy-ebook-prometheus
+    volumes:
+      - ../../infra/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../../infra/monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - ebook-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  # ---------------------------------------------------------------------------
+  # Grafana (Visualization)
+  # ---------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:latest
+    container_name: abdulboy-ebook-grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../../infra/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../../infra/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-grafana_secure_123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    ports:
+      - "3000:3000"
+    networks:
+      - ebook-network
+    depends_on:
+      - prometheus
+
+  # ---------------------------------------------------------------------------
+  # Jaeger (Distributed Tracing)
+  # ---------------------------------------------------------------------------
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: abdulboy-ebook-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - ebook-network
+
+  # ---------------------------------------------------------------------------
+  # LocalStack (AWS Mock for Development)
+  # ---------------------------------------------------------------------------
+  localstack:
+    image: localstack/localstack:latest
+    container_name: abdulboy-ebook-localstack
+    environment:
+      - SERVICES=s3,sqs,sns,lambda,cloudwatch,events
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ebook-network
+
+# ---------------------------------------------------------------------------
+# Networks
+# ---------------------------------------------------------------------------
+networks:
+  ebook-network:
+    external: true
+
+# ---------------------------------------------------------------------------
+# Volumes
+# ---------------------------------------------------------------------------
+volumes:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+  localstack_data:
