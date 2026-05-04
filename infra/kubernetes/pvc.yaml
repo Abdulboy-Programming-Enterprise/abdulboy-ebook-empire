@@ -1,0 +1,87 @@
+# =============================================================================
+# PERSISTENT VOLUME CLAIMS - Abdulboy Ebook Empire
+# =============================================================================
+---
+# Static Files Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-files-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: efs-sc
+---
+# Uploads Storage (Book PDFs, Images, etc.)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: efs-sc
+---
+# Database Backup Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backups-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: gp2
+---
+# PostgreSQL Data (if using persistent storage)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: gp2
+---
+# MongoDB Data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-data-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: gp2
+---
+# Redis Data (if persistence enabled)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data-pvc
+  namespace: abdulboy-ebook
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: gp2
