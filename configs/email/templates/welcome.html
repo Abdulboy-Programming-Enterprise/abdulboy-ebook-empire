@@ -1,0 +1,176 @@
+<!-- ========================================================================= -->
+<!-- WELCOME EMAIL TEMPLATE -->
+<!-- ========================================================================= -->
+<!-- Sent to new users upon registration -->
+<!-- ========================================================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Abdulboy Ebook Empire</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      padding: 30px 20px;
+      text-align: center;
+    }
+    .logo {
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .feature {
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+    }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .feature-desc {
+      font-size: 12px;
+      color: #666;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #e0e0e0;
+    }
+    .social-links {
+      margin-top: 15px;
+    }
+    .social-links a {
+      color: #6366f1;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    @media (max-width: 600px) {
+      .content {
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://abdulboy-ebook.com/images/logo/logo-light.svg" alt="Abdulboy Ebook Empire" class="logo" width="180">
+      <h1>Welcome to the Family! 📚</h1>
+    </div>
+    
+    <div class="content">
+      <p>Dear <strong>{{name}}</strong>,</p>
+      
+      <p>Welcome to <strong>Abdulboy Ebook Empire</strong>! We're absolutely thrilled to have you join our community of passionate readers and authors.</p>
+      
+      <p>You've just unlocked access to a world of knowledge, imagination, and inspiration. Whether you're here to discover new stories, learn new skills, or share your own writing, you're in the right place.</p>
+      
+      <div style="text-align: center;">
+        <a href="{{dashboardUrl}}" class="button">Start Reading Now →</a>
+      </div>
+      
+      <h3>What You Can Do Next:</h3>
+      
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">📖</div>
+          <div class="feature-title">Browse Books</div>
+          <div class="feature-desc">Explore thousands of titles</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⭐</div>
+          <div class="feature-title">Subscribe</div>
+          <div class="feature-desc">Unlock unlimited reading</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">✍️</div>
+          <div class="feature-title">Custom Book</div>
+          <div class="feature-desc">Request personalized content</div>
+        </div>
+      </div>
+      
+      <h3>Pro Tips for Getting Started:</h3>
+      <ul>
+        <li>📚 Complete your profile to get personalized recommendations</li>
+        <li>⭐ Check out our curated collections and bestsellers</li>
+        <li>🎁 Subscribe to our newsletter for exclusive deals and new releases</li>
+        <li>💬 Use our AI chatbot for instant help and book suggestions</li>
+      </ul>
+      
+      <p>If you have any questions, our support team is always here to help. Simply reply to this email or visit our <a href="https://abdulboy-ebook.com/help">Help Center</a>.</p>
+      
+      <p>Happy reading!<br>
+      <strong>The Abdulboy Ebook Empire Team</strong></p>
+      
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+      
+      <p style="font-size: 12px; color: #666; text-align: center;">
+        P.S. Don't forget to check out our free book collection - included with every new account!
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>&copy; 2026 Abdulboy Programming Enterprise. All rights reserved.</p>
+      <p>Lagos, Nigeria</p>
+      <div class="social-links">
+        <a href="https://twitter.com/AbdulboyEbook">Twitter</a> •
+        <a href="https://facebook.com/AbdulboyEbook">Facebook</a> •
+        <a href="https://instagram.com/AbdulboyEbook">Instagram</a>
+      </div>
+      <p style="margin-top: 15px;">
+        <a href="{{unsubscribeUrl}}">Unsubscribe</a> | 
+        <a href="https://abdulboy-ebook.com/privacy">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
