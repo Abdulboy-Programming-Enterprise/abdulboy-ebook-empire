@@ -1,0 +1,15 @@
+# =============================================================================
+# KUBERNETES NAMESPACE - Abdulboy Ebook Empire
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: abdulboy-ebook
+  labels:
+    name: abdulboy-ebook
+    environment: production
+    team: platform
+    cost-center: ebook-platform
+  annotations:
+    description: "Abdulboy Ebook Empire Production Environment"
+    contact: "platform@abdulboy-ebook.com"
