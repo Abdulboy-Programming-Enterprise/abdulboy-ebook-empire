@@ -1,0 +1,190 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "defaultProvider": "stripe",
+  "providers": {
+    "stripe": {
+      "name": "Stripe",
+      "displayName": "Credit/Debit Card",
+      "icon": "/images/payments/stripe.svg",
+      "enabled": true,
+      "isDefault": true,
+      "priority": 1,
+      "currencies": ["USD", "EUR", "GBP"],
+      "paymentMethods": [
+        {
+          "id": "card",
+          "name": "Credit/Debit Card",
+          "icon": "/images/payments/card.svg",
+          "enabled": true
+        },
+        {
+          "id": "apple_pay",
+          "name": "Apple Pay",
+          "icon": "/images/payments/apple-pay.svg",
+          "enabled": true
+        },
+        {
+          "id": "google_pay",
+          "name": "Google Pay",
+          "icon": "/images/payments/google-pay.svg",
+          "enabled": true
+        }
+      ],
+      "config": {
+        "testMode": true,
+        "webhookUrl": "/api/v1/webhooks/stripe"
+      }
+    },
+    "opay": {
+      "name": "OPay",
+      "displayName": "OPay",
+      "icon": "/images/payments/opay.svg",
+      "enabled": true,
+      "isDefault": false,
+      "priority": 2,
+      "currencies": ["NGN"],
+      "paymentMethods": [
+        {
+          "id": "card",
+          "name": "Card Payment",
+          "icon": "/images/payments/card.svg",
+          "enabled": true
+        },
+        {
+          "id": "bank",
+          "name": "Bank Transfer",
+          "icon": "/images/payments/bank.svg",
+          "enabled": true
+        },
+        {
+          "id": "ussd",
+          "name": "USSD",
+          "icon": "/images/payments/ussd.svg",
+          "enabled": true
+        },
+        {
+          "id": "qr",
+          "name": "QR Code",
+          "icon": "/images/payments/qr.svg",
+          "enabled": true
+        },
+        {
+          "id": "transfer",
+          "name": "Account Transfer",
+          "icon": "/images/payments/transfer.svg",
+          "enabled": true
+        }
+      ],
+      "config": {
+        "testMode": true,
+        "webhookUrl": "/api/v1/webhooks/opay",
+        "country": "NG",
+        "banks": [
+          { "code": "000", "name": "Access Bank" },
+          { "code": "001", "name": "Zenith Bank" },
+          { "code": "002", "name": "First Bank" },
+          { "code": "003", "name": "GTBank" },
+          { "code": "004", "name": "UBA" },
+          { "code": "005", "name": "FCMB" },
+          { "code": "006", "name": "Stanbic IBTC" },
+          { "code": "007", "name": "Union Bank" },
+          { "code": "008", "name": "Fidelity Bank" },
+          { "code": "009", "name": "Keystone Bank" },
+          { "code": "010", "name": "Polaris Bank" },
+          { "code": "011", "name": "Wema Bank" },
+          { "code": "012", "name": "Heritage Bank" },
+          { "code": "013", "name": "Unity Bank" },
+          { "code": "014", "name": "Jaiz Bank" },
+          { "code": "015", "name": "Taj Bank" }
+        ]
+      }
+    },
+    "paypal": {
+      "name": "PayPal",
+      "displayName": "PayPal",
+      "icon": "/images/payments/paypal.svg",
+      "enabled": false,
+      "isDefault": false,
+      "priority": 3,
+      "currencies": ["USD", "EUR", "GBP"],
+      "paymentMethods": [
+        {
+          "id": "paypal",
+          "name": "PayPal Balance",
+          "icon": "/images/payments/paypal.svg",
+          "enabled": true
+        },
+        {
+          "id": "card",
+          "name": "Credit/Debit Card",
+          "icon": "/images/payments/card.svg",
+          "enabled": true
+        }
+      ],
+      "config": {
+        "testMode": true,
+        "webhookUrl": "/api/v1/webhooks/paypal"
+      }
+    },
+    "flutterwave": {
+      "name": "Flutterwave",
+      "displayName": "Flutterwave",
+      "icon": "/images/payments/flutterwave.svg",
+      "enabled": false,
+      "isDefault": false,
+      "priority": 4,
+      "currencies": ["NGN", "GHS", "KES", "ZAR"],
+      "paymentMethods": [
+        {
+          "id": "card",
+          "name": "Card Payment",
+          "icon": "/images/payments/card.svg",
+          "enabled": true
+        },
+        {
+          "id": "mobile_money",
+          "name": "Mobile Money",
+          "icon": "/images/payments/mobile-money.svg",
+          "enabled": true
+        },
+        {
+          "id": "bank_transfer",
+          "name": "Bank Transfer",
+          "icon": "/images/payments/bank.svg",
+          "enabled": true
+        }
+      ],
+      "config": {
+        "testMode": true,
+        "webhookUrl": "/api/v1/webhooks/flutterwave"
+      }
+    }
+  },
+  "currencyConversion": {
+    "enabled": true,
+    "baseCurrency": "USD",
+    "exchangeRates": {
+      "NGN": 1480,
+      "EUR": 0.92,
+      "GBP": 0.79,
+      "GHS": 12.5,
+      "KES": 130,
+      "ZAR": 18.5
+    },
+    "updateFrequency": "daily",
+    "lastUpdated": "2026-04-24"
+  },
+  "webhookConfig": {
+    "maxRetries": 5,
+    "initialDelay": 1000,
+    "backoffFactor": 2,
+    "timeout": 30000
+  },
+  "refundConfig": {
+    "allowedDays": 30,
+    "autoApprove": false,
+    "requireApproval": true,
+    "reviewThreshold": 10000
+  }
+}
