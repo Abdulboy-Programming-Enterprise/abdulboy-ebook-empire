@@ -1,0 +1,193 @@
+<!-- ========================================================================= -->
+<!-- NEWSLETTER SIGNUP - Email Subscription Form -->
+<!-- ========================================================================= -->
+
+<div class="newsletter-signup" id="newsletter-signup">
+  <div class="newsletter-container">
+    <div class="newsletter-icon">📧</div>
+    <h3 class="newsletter-title">Stay in the Loop</h3>
+    <p class="newsletter-description">
+      Subscribe to our newsletter and get exclusive updates on new releases, author interviews, and special offers.
+    </p>
+    <form class="newsletter-form" id="newsletter-form">
+      <div class="newsletter-input-group">
+        <input type="email" placeholder="Enter your email address" required id="newsletter-email">
+        <button type="submit" class="newsletter-submit">Subscribe</button>
+      </div>
+      <div class="newsletter-checkbox">
+        <label>
+          <input type="checkbox" id="newsletter-consent" required>
+          <span>I agree to receive marketing emails. I can unsubscribe at any time.</span>
+        </label>
+      </div>
+    </form>
+    <div class="newsletter-success" id="newsletter-success" style="display: none;">
+      <div class="success-icon">✓</div>
+      <p>Thank you for subscribing! Please check your email to confirm.</p>
+    </div>
+    <div class="newsletter-error" id="newsletter-error" style="display: none;">
+      <p>Something went wrong. Please try again.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+.newsletter-signup {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+  color: white;
+}
+
+.newsletter-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.newsletter-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.newsletter-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.newsletter-description {
+  margin-bottom: 1.5rem;
+  opacity: 0.95;
+}
+
+.newsletter-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.newsletter-input-group input {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.newsletter-input-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.newsletter-submit {
+  padding: 0.875rem 2rem;
+  background: white;
+  color: var(--primary-color);
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.newsletter-submit:hover {
+  transform: scale(1.02);
+}
+
+.newsletter-checkbox {
+  font-size: 0.813rem;
+  opacity: 0.9;
+}
+
+.newsletter-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.newsletter-checkbox input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.newsletter-success,
+.newsletter-error {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.newsletter-success {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  background: white;
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem;
+}
+
+.newsletter-error {
+  background: rgba(220, 38, 38, 0.8);
+}
+
+@media (max-width: 768px) {
+  .newsletter-input-group {
+    flex-direction: column;
+  }
+  
+  .newsletter-submit {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const form = document.getElementById('newsletter-form');
+  const successDiv = document.getElementById('newsletter-success');
+  const errorDiv = document.getElementById('newsletter-error');
+  const emailInput = document.getElementById('newsletter-email');
+  
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = emailInput.value.trim();
+    const consent = document.getElementById('newsletter-consent').checked;
+    
+    if (!email || !consent) return;
+    
+    // Hide previous messages
+    successDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    
+    try {
+      const response = await fetch('/api/v1/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (response.ok) {
+        successDiv.style.display = 'block';
+        form.reset();
+      } else {
+        errorDiv.style.display = 'block';
+      }
+    } catch (error) {
+      errorDiv.style.display = 'block';
+      console.error('Newsletter error:', error);
+    }
+  });
+})();
+</script>
