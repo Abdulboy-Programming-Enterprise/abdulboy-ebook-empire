@@ -1,0 +1,234 @@
+# =============================================================================
+# PROMETHEUS ALERTING RULES - Abdulboy Ebook Empire
+# =============================================================================
+groups:
+  # ---------------------------------------------------------------------------
+  # API Backend Alerts
+  # ---------------------------------------------------------------------------
+  - name: api_alerts
+    interval: 30s
+    rules:
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is {{ $value | humanizePercentage }} for {{ $labels.job }}"
+
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High API latency"
+          description: "API p95 latency is {{ $value }}s for {{ $labels.job }}"
+
+      - alert: APIInstanceDown
+        expr: up{job="abdulboy-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "API instance down"
+          description: "API instance {{ $labels.instance }} is down"
+
+  # ---------------------------------------------------------------------------
+  # Database Alerts
+  # ---------------------------------------------------------------------------
+  - name: database_alerts
+    interval: 30s
+    rules:
+      - alert: PostgresHighConnections
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "High PostgreSQL connections"
+          description: "PostgreSQL has {{ $value }} connections"
+
+      - alert: PostgresReplicationLag
+        expr: pg_replication_lag > 60        for: 5m
+        labels:
+          severity: critical
+          team: database
+        annotations:
+          summary: "PostgreSQL replication lag"
+          description: "Replication lag is {{ $value }} seconds"
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis is using {{ $value | humanizePercentage }} of max memory"
+
+      - alert: MongoDBConnectionPoolExhausted
+        expr: mongodb_connections_available == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: database
+        annotations:
+          summary: "MongoDB connection pool exhausted"
+          description: "No available connections in MongoDB pool"
+
+  # ---------------------------------------------------------------------------
+  # Worker & Queue Alerts
+  # ---------------------------------------------------------------------------
+  - name: worker_alerts
+    interval: 30s
+    rules:
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length > 1000
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Celery queue backlog"
+          description: "Queue {{ $labels.queue }} has {{ $value }} pending tasks"
+
+      - alert: CeleryWorkerDown
+        expr: celery_workers_online == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "No Celery workers running"
+          description: "No active Celery workers found"
+
+      - alert: FailedCeleryTasks
+        expr: rate(celery_tasks_total{state="FAILURE"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High rate of failed Celery tasks"
+          description: "Failure rate is {{ $value }} tasks per second"
+
+  # ---------------------------------------------------------------------------
+  # Business Metrics Alerts
+  # ---------------------------------------------------------------------------
+  - name: business_alerts
+    interval: 1m
+    rules:
+      - alert: PaymentFailureRateHigh
+        expr: rate(payment_failures_total[10m]) / rate(payment_attempts_total[10m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: payments
+        annotations:
+          summary: "High payment failure rate"
+          description: "Payment failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: LowConversionRate
+        expr: rate(checkout_completed_total[1h]) / rate(checkout_started_total[1h]) < 0.1
+        for: 30m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "Low checkout conversion rate"
+          description: "Conversion rate is {{ $value | humanizePercentage }}"
+
+      - alert: UserSignupSpike
+        expr: rate(user_signups_total[5m]) > 100
+        for: 10m
+        labels:
+          severity: info
+          team: product
+        annotations:
+          summary: "User signup spike detected"
+          description: "Signup rate is {{ $value }} per second"
+
+  # ---------------------------------------------------------------------------
+  # System Resource Alerts
+  # ---------------------------------------------------------------------------
+  - name: system_alerts
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: sum(rate(container_cpu_usage_seconds_total[5m])) by (pod) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage"
+          description: "Pod {{ $labels.pod }} has high CPU usage: {{ $value | humanizePercentage }}"
+
+      - alert: HighMemoryUsage
+        expr: (sum(container_memory_working_set_bytes) by (pod) / sum(container_spec_memory_limit_bytes) by (pod)) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage"
+          description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of memory limit"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+
+  # ---------------------------------------------------------------------------
+  # SSL Certificate Alerts
+  # ---------------------------------------------------------------------------
+  - name: ssl_alerts
+    interval: 1h
+    rules:
+      - alert: SSLCertificateExpiringSoon
+        expr: (ssl_certificate_expiry_timestamp - time()) / 86400 < 30
+        for: 0m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "Certificate for {{ $labels.domain }} expires in {{ $value | humanizeDuration }}"
+
+  # ---------------------------------------------------------------------------
+  # Security Alerts
+  # ---------------------------------------------------------------------------
+  - name: security_alerts
+    interval: 1m
+    rules:
+      - alert: FailedLoginAttempts
+        expr: rate(failed_logins_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "Multiple failed login attempts"
+          description: "{{ $value }} failed logins per second from {{ $labels.ip }}"
+
+      - alert: APIAbuseDetected
+        expr: rate(http_requests_total[1m]) > 1000
+        for: 2m
+        labels:
+          severity: critical
+          team: security
+        annotations:
+          summary: "Possible API abuse detected"
+          description: "High request rate: {{ $value }} requests/second"
