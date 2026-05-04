@@ -1,0 +1,175 @@
+<!-- ========================================================================= -->
+<!-- TEXT RESIZER - Accessibility Control -->
+<!-- ========================================================================= -->
+
+<div class="text-resizer-control" id="text-resizer" data-component="text-resizer">
+  <div class="text-resizer-container">
+    <div class="text-resizer-header">
+      <span class="resizer-icon">Aa</span>
+      <span class="resizer-title">Text Size</span>
+      <button class="resizer-toggle" id="resizer-toggle">−</button>
+    </div>
+    <div class="text-resizer-controls" id="resizer-controls" style="display: none;">
+      <div class="resizer-scale">
+        <button class="resizer-btn resizer-decrease" id="text-decrease" aria-label="Decrease text size">A-</button>
+        <div class="resizer-value">
+          <span id="text-size-value">100</span>%
+        </div>
+        <button class="resizer-btn resizer-increase" id="text-increase" aria-label="Increase text size">A+</button>
+      </div>
+      <button class="resizer-reset" id="text-reset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.text-resizer-control {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 1000;
+}
+
+.text-resizer-container {
+  background: var(--bg-primary);
+  border-radius: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.text-resizer-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background: var(--bg-secondary);
+}
+
+.resizer-icon {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.resizer-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.resizer-toggle {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.resizer-controls {
+  padding: 0.75rem 1rem;
+}
+
+.resizer-scale {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.resizer-btn {
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.resizer-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.resizer-value {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+}
+
+.resizer-reset {
+  width: 100%;
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .text-resizer-control {
+    bottom: 1rem;
+    left: 1rem;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const toggleBtn = document.getElementById('resizer-toggle');
+  const controls = document.getElementById('resizer-controls');
+  const decreaseBtn = document.getElementById('text-decrease');
+  const increaseBtn = document.getElementById('text-increase');
+  const resetBtn = document.getElementById('text-reset');
+  const sizeValueSpan = document.getElementById('text-size-value');
+  
+  let currentSize = parseInt(localStorage.getItem('text_size') || '100');
+  
+  function applyTextSize(size) {
+    document.documentElement.style.fontSize = size + '%';
+    sizeValueSpan.textContent = size;
+    localStorage.setItem('text_size', size);
+  }
+  
+  function increaseSize() {
+    if (currentSize < 150) {
+      currentSize += 5;
+      applyTextSize(currentSize);
+    }
+  }
+  
+  function decreaseSize() {
+    if (currentSize > 75) {
+      currentSize -= 5;
+      applyTextSize(currentSize);
+    }
+  }
+  
+  function resetSize() {
+    currentSize = 100;
+    applyTextSize(currentSize);
+  }
+  
+  // Initialize
+  applyTextSize(currentSize);
+  
+  toggleBtn?.addEventListener('click', () => {
+    const isVisible = controls.style.display === 'block';
+    controls.style.display = isVisible ? 'none' : 'block';
+    toggleBtn.textContent = isVisible ? '+' : '−';
+  });
+  
+  increaseBtn?.addEventListener('click', increaseSize);
+  decreaseBtn?.addEventListener('click', decreaseSize);
+  resetBtn?.addEventListener('click', resetSize);
+})();
+</script>
