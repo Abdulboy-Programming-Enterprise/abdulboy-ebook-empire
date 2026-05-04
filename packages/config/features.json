@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "features": {
+    "core": {
+      "authentication": {
+        "enabled": true,
+        "methods": ["email", "password"],
+        "socialLogin": false,
+        "twoFactorAuth": false
+      },
+      "bookManagement": {
+        "enabled": true,
+        "uploadFormats": ["pdf", "epub", "mobi"],
+        "maxFileSize": 52428800,
+        "autoGeneratePreview": true
+      },
+      "paymentGateway": {
+        "enabled": true,
+        "providers": ["stripe", "opay"],
+        "testMode": true
+      },
+      "subscriptionSystem": {
+        "enabled": true,
+        "plans": ["free", "basic", "premium"],
+        "trialDays": 7
+      }
+    },
+    "advanced": {
+      "aiRecommendations": {
+        "enabled": true,
+        "algorithm": "hybrid",
+        "maxRecommendations": 10
+      },
+      "gamification": {
+        "enabled": true,
+        "badges": true,
+        "leaderboards": true,
+        "pointsSystem": true
+      },
+      "watermarking": {
+        "enabled": true,
+        "type": "invisible",
+        "includeReaderName": true
+      },
+      "optimization": {
+        "enabled": true,
+        "imageCompression": true,
+        "lazyLoading": true,
+        "cdnIntegration": true
+      }
+    },
+    "userExperience": {
+      "pwa": {
+        "enabled": true,
+        "offlineSupport": true,
+        "pushNotifications": true
+      },
+      "accessibility": {
+        "textResizer": true,
+        "highContrast": false,
+        "screenReader": true
+      },
+      "themes": {
+        "enabled": true,
+        "options": ["light", "dark", "system"],
+        "default": "system"
+      },
+      "chatbot": {
+        "enabled": true,
+        "type": "ai",
+        "contextMemory": 5
+      }
+    },
+    "admin": {
+      "dashboard": {
+        "realTimeStats": true,
+        "exportData": true
+      },
+      "userManagement": {
+        "createSpecialUsers": true,
+        "manageAdmins": true
+      },
+      "analytics": {
+        "salesReports": true,
+        "userReports": true,
+        "exportFormats": ["csv", "json", "pdf"]
+      }
+    }
+  },
+  "limits": {
+    "user": {
+      "maxBookmarks": 1000,
+      "maxHighlights": 5000,
+      "maxReviewsPerDay": 10
+    },
+    "book": {
+      "maxTags": 10,
+      "maxCategories": 5
+    },
+    "system": {
+      "rateLimitRequests": 100,
+      "rateLimitWindow": 60,
+      "maxUploadSize": 52428800
+    }
+  }
+}
