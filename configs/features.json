@@ -1,0 +1,170 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "features": {
+    "core": {
+      "userAuthentication": {
+        "enabled": true,
+        "methods": ["email", "password"],
+        "socialLogin": ["google", "facebook", "twitter"],
+        "twoFactorAuth": false
+      },
+      "bookManagement": {
+        "enabled": true,
+        "uploadFormats": ["pdf", "epub", "mobi"],
+        "maxFileSize": 52428800,
+        "autoGeneratePreview": true,
+        "previewPages": 10
+      },
+      "paymentGateway": {
+        "enabled": true,
+        "providers": ["stripe", "opay"],
+        "currencies": ["USD", "NGN"],
+        "webhooks": true
+      },
+      "subscriptionSystem": {
+        "enabled": true,
+        "plans": ["free", "basic", "premium"],
+        "trialPeriod": 7,
+        "autoRenewal": true
+      }
+    },
+    "advanced": {
+      "aiRecommendations": {
+        "enabled": true,
+        "algorithm": "hybrid",
+        "updateFrequency": "daily",
+        "maxRecommendations": 10
+      },
+      "gamification": {
+        "enabled": true,
+        "badges": true,
+        "leaderboards": true,
+        "dailyChallenges": true,
+        "pointsSystem": true
+      },
+      "watermarking": {
+        "enabled": true,
+        "type": "invisible",
+        "includeReaderName": true,
+        "includeTimestamp": true
+      },
+      "optimization": {
+        "enabled": true,
+        "imageCompression": true,
+        "lazyLoading": true,
+        "cdnIntegration": true,
+        "browserCaching": true
+      },
+      "analytics": {
+        "enabled": true,
+        "eventTracking": true,
+        "userBehavior": true,
+        "salesReporting": true,
+        "realTime": true
+      }
+    },
+    "userExperience": {
+      "pwa": {
+        "enabled": true,
+        "offlineSupport": true,
+        "pushNotifications": true,
+        "installPrompt": true
+      },
+      "accessibility": {
+        "enabled": true,
+        "textResizer": true,
+        "highContrast": false,
+        "screenReader": true
+      },
+      "themes": {
+        "enabled": true,
+        "options": ["light", "dark", "system"],
+        "default": "system"
+      },
+      "chatbot": {
+        "enabled": true,
+        "type": "ai",
+        "trainingData": "/storage/data/chatbot/intents.json",
+        "contextMemory": 5
+      }
+    },
+    "admin": {
+      "dashboard": {
+        "enabled": true,
+        "realTimeStats": true,
+        "exportData": true,
+        "sendNotifications": true
+      },
+      "userManagement": {
+        "enabled": true,
+        "createSpecialUsers": true,
+        "manageAdminAccounts": true,
+        "suspendUsers": true
+      },
+      "bookManagement": {
+        "enabled": true,
+        "bulkUpload": true,
+        "bulkEdit": true,
+        "manageCategories": true
+      },
+      "analytics": {
+        "enabled": true,
+        "salesReports": true,
+        "userReports": true,
+        "bookReports": true,
+      "exportFormats": ["csv", "json", "pdf"]
+      },
+      "backupRestore": {
+        "enabled": true,
+        "automatedBackups": true,
+        "oneClickRestore": true,
+        "backupSchedule": "daily"
+      }
+    },
+    "integrations": {
+      "email": {
+        "provider": "sendgrid",
+        "templates": ["welcome", "purchase", "booking", "reset"]
+      },
+      "sms": {
+        "enabled": false,
+        "provider": null
+      },
+      "socialMedia": {
+        "enabled": false,
+        "autoPost": false
+      },
+      "affiliate": {
+        "enabled": false,
+        "commission": 0.1
+      }
+    }
+  },
+  "limits": {
+    "user": {
+      "maxBookmarksPerUser": 1000,
+      "maxHighlightsPerUser": 5000,
+      "maxNotesPerUser": 2000,
+      "maxReviewsPerDay": 10
+    },
+    "book": {
+      "maxTagsPerBook": 10,
+      "maxCategoriesPerBook": 5,
+      "maxAuthorsPerBook": 3
+    },
+    "system": {
+      "concurrentUsers": 10000,
+      "maxUploadSize": 52428800,
+      "rateLimitRequests": 100,
+      "rateLimitWindow": 60
+    }
+  },
+  "scheduled": {
+    "backup": "0 2 * * *",
+    "cleanupTemp": "0 3 * * *",
+    "updateRecommendations": "0 4 * * *",
+    "sendNewsletter": "0 9 * * 1",
+    "generateReports": "0 1 * * 0"
+  }
+}
