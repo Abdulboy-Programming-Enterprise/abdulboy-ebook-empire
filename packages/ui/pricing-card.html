@@ -1,0 +1,258 @@
+<!-- ========================================================================= -->
+<!-- PRICING CARD COMPONENT - Subscription Plan Display -->
+<!-- ========================================================================= -->
+
+<div class="pricing-card" data-component="pricing-card">
+  <div class="pricing-card-inner">
+    <!-- Plan Header -->
+    <div class="pricing-header">
+      <h3 class="plan-name"></h3>
+      <p class="plan-description"></p>
+    </div>
+
+    <!-- Price -->
+    <div class="pricing-price">
+      <span class="currency">$</span>
+      <span class="amount"></span>
+      <span class="period">/month</span>
+    </div>
+
+    <!-- Features List -->
+    <ul class="pricing-features">
+      <!-- Features injected dynamically -->
+    </ul>
+
+    <!-- Action Button -->
+    <div class="pricing-action">
+      <button class="subscribe-btn">Get Started</button>
+    </div>
+
+    <!-- Popular Badge -->
+    <div class="popular-badge" style="display: none;">Most Popular</div>
+  </div>
+</div>
+
+<style>
+.pricing-card {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  position: relative;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.pricing-card.popular {
+  border: 2px solid var(--primary-color);
+  transform: scale(1.02);
+}
+
+.pricing-card.popular:hover {
+  transform: scale(1.02) translateY(-8px);
+}
+
+.pricing-card-inner {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.popular-badge {
+  position: absolute;
+  top: 1rem;
+  right: -2rem;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transform: rotate(45deg);
+  width: 120px;
+}
+
+.pricing-header {
+  margin-bottom: 1.5rem;
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.plan-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.pricing-price {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.currency {
+  font-size: 1.25rem;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.amount {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.period {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  text-align: left;
+}
+
+.pricing-features li {
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.pricing-features li::before {
+  content: "✓";
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.pricing-features li.disabled {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.pricing-features li.disabled::before {
+  content: "✗";
+  color: var(--error-color);
+}
+
+.subscribe-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.subscribe-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.02);
+}
+
+.pricing-card.popular .subscribe-btn {
+  background: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+  .pricing-card.popular {
+    transform: scale(1);
+  }
+  
+  .pricing-card.popular:hover {
+    transform: scale(1) translateY(-8px);
+  }
+}
+</style>
+
+<script>
+// Pricing Card Component
+(function() {
+  window.renderPricingCard = function(plan, container) {
+    const card = document.createElement('div');
+    card.className = `pricing-card ${plan.is_popular ? 'popular' : ''}`;
+    
+    const featuresHtml = plan.features.map(feature => `
+      <li class="${feature.enabled ? '' : 'disabled'}">
+        ${feature.text}
+      </li>
+    `).join('');
+    
+    card.innerHTML = `
+      <div class="pricing-card-inner">
+        <div class="pricing-header">
+          <h3 class="plan-name">${escapeHtml(plan.name)}</h3>
+          <p class="plan-description">${escapeHtml(plan.description)}</p>
+        </div>
+        <div class="pricing-price">
+          <span class="currency">${plan.currency_symbol || '$'}</span>
+          <span class="amount">${plan.price}</span>
+          <span class="period">/${plan.interval}</span>
+        </div>
+        <ul class="pricing-features">
+          ${featuresHtml}
+        </ul>
+        <div class="pricing-action">
+          <button class="subscribe-btn" data-plan-id="${plan.id}">${plan.cta_text || 'Get Started'}</button>
+        </div>
+        ${plan.is_popular ? '<div class="popular-badge">Most Popular</div>' : ''}
+      </div>
+    `;
+    
+    // Attach event listener
+    const subscribeBtn = card.querySelector('.subscribe-btn');
+    subscribeBtn?.addEventListener('click', () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        window.location.href = `/checkout.html?plan_id=${plan.id}`;
+      } else {
+        window.location.href = `/signup.html?redirect=/checkout.html?plan_id=${plan.id}`;
+      }
+    });
+    
+    if (container) {
+      container.appendChild(card);
+    }
+    
+    return card;
+  };
+  
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Load plans from API
+  window.loadPricingPlans = async function(container) {
+    try {
+      const response = await fetch('/api/v1/subscriptions/plans');
+      const plans = await response.json();
+      
+      container.innerHTML = '';
+      plans.forEach(plan => {
+        renderPricingCard(plan, container);
+      });
+    } catch (error) {
+      console.error('Failed to load plans:', error);
+      container.innerHTML = '<p class="error">Failed to load pricing plans. Please try again later.</p>';
+    }
+  };
+})();
+</script>
