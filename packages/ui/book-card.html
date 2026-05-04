@@ -1,0 +1,582 @@
+<!-- ========================================================================= -->
+<!-- BOOK CARD COMPONENT - Reusable Book Display Card -->
+<!-- ========================================================================= -->
+<!-- Usage: Include via JavaScript templating or server-side include -->
+<!-- Data attributes support dynamic content loading -->
+<!-- ========================================================================= -->
+
+<div class="book-card" data-component="book-card">
+  <div class="book-card-inner">
+    <!-- Book Cover -->
+    <div class="book-cover">
+      <img class="book-cover-img" loading="lazy" alt="Book cover">
+      <div class="book-cover-overlay">
+        <button class="quick-view-btn" data-action="quick-view">Quick View</button>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="book-badges">
+      <span class="badge badge-free" style="display: none;">FREE</span>
+      <span class="badge badge-bestseller" style="display: none;">Best Seller</span>
+      <span class="badge badge-new" style="display: none;">New</span>
+    </div>
+
+    <!-- Book Info -->
+    <div class="book-info">
+      <h3 class="book-title">
+        <a href="#" class="book-title-link"></a>
+      </h3>
+      <p class="book-author">by <span class="author-name"></span></p>
+      <div class="book-rating">
+        <div class="stars" data-rating="0">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <span class="review-count">(0 reviews)</span>
+      </div>
+      <p class="book-description"></p>
+    </div>
+
+    <!-- Price & Actions -->
+    <div class="book-footer">
+      <div class="book-price">
+        <span class="price-current"></span>
+        <span class="price-original" style="display: none;"></span>
+      </div>
+      <div class="book-actions">
+        <button class="action-btn preview-btn" data-action="preview">Preview</button>
+        <button class="action-btn buy-btn" data-action="buy">Buy Now</button>
+        <button class="action-btn wishlist-btn" data-action="wishlist" aria-label="Add to wishlist">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.book-card {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.book-card-inner {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.book-cover {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.book-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover .book-cover-img {
+  transform: scale(1.05);
+}
+
+.book-cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.book-card:hover .book-cover-overlay {
+  opacity: 1;
+}
+
+.quick-view-btn {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  transition: transform 0.2s;
+}
+
+.quick-view-btn:hover {
+  transform: scale(1.05);
+}
+
+.book-badges {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 1;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.688rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-free {
+  background: var(--success-color, #10b981);
+  color: white;
+}
+
+.badge-bestseller {
+  background: var(--accent-color, #ec4899);
+  color: white;
+}
+
+.badge-new {
+  background: var(--primary-color, #6366f1);
+  color: white;
+}
+
+.book-info {
+  flex: 1;
+}
+
+.book-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  line-height: 1.4;
+}
+
+.book-title-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.book-title-link:hover {
+  color: var(--primary-color);
+}
+
+.book-author {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.book-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.125rem;
+  color: #d4d4d8;
+  font-size: 0.875rem;
+}
+
+.stars[data-rating="1"] span:nth-child(1),
+.stars[data-rating="2"] span:nth-child(-n+2),
+.stars[data-rating="3"] span:nth-child(-n+3),
+.stars[data-rating="4"] span:nth-child(-n+4),
+.stars[data-rating="5"] span {
+  color: #fbbf24;
+}
+
+.review-count {
+  font-size: 0.688rem;
+  color: var(--text-muted);
+}
+
+.book-description {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.book-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.price-current {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.price-original {
+  font-size: 0.813rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.book-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preview-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.preview-btn:hover {
+  background: var(--bg-hover);
+}
+
+.buy-btn {
+  background: var(--primary-color);
+  border: none;
+  color: white;
+}
+
+.buy-btn:hover {
+  background: var(--primary-dark);
+}
+
+.wishlist-btn {
+  padding: 0.375rem;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.wishlist-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.wishlist-btn.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .book-actions .preview-btn {
+    display: none;
+  }
+}
+</style>
+
+<script>
+// Book Card Component Initialization
+(function() {
+  // Function to render a book card from data
+  window.renderBookCard = function(bookData, container) {
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    card.dataset.bookId = bookData.id;
+    
+    card.innerHTML = `
+      <div class="book-card-inner">
+        <div class="book-cover">
+          <img class="book-cover-img" src="${bookData.cover_image_url || '/images/default-book-cover.jpg'}" alt="${escapeHtml(bookData.title)}" loading="lazy">
+          <div class="book-cover-overlay">
+            <button class="quick-view-btn" data-action="quick-view">Quick View</button>
+          </div>
+        </div>
+        <div class="book-badges">
+          ${bookData.is_free ? '<span class="badge badge-free">FREE</span>' : ''}
+          ${bookData.is_bestseller ? '<span class="badge badge-bestseller">Best Seller</span>' : ''}
+          ${bookData.is_new ? '<span class="badge badge-new">New</span>' : ''}
+        </div>
+        <div class="book-info">
+          <h3 class="book-title">
+            <a href="/book-preview.html?id=${bookData.id}" class="book-title-link">${escapeHtml(bookData.title)}</a>
+          </h3>
+          <p class="book-author">by <span class="author-name">${escapeHtml(bookData.author_name)}</span></p>
+          <div class="book-rating">
+            <div class="stars" data-rating="${bookData.average_rating || 0}">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+            <span class="review-count">(${bookData.review_count || 0} reviews)</span>
+          </div>
+          <p class="book-description">${escapeHtml(bookData.description?.substring(0, 100) || '')}${bookData.description?.length > 100 ? '...' : ''}</p>
+        </div>
+        <div class="book-footer">
+          <div class="book-price">
+            <span class="price-current">${bookData.is_free ? 'FREE' : `$${bookData.price.toFixed(2)}`}</span>
+            ${bookData.original_price ? `<span class="price-original">$${bookData.original_price.toFixed(2)}</span>` : ''}
+          </div>
+          <div class="book-actions">
+            <button class="action-btn preview-btn" data-action="preview">Preview</button>
+            <button class="action-btn buy-btn" data-action="buy">Buy Now</button>
+            <button class="action-btn wishlist-btn" data-action="wishlist" aria-label="Add to wishlist">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Attach event listeners
+    attachCardEvents(card, bookData);
+    
+    if (container) {
+      container.appendChild(card);
+    }
+    
+    return card;
+  };
+  
+  function attachCardEvents(card, bookData) {
+    // Preview button
+    const previewBtn = card.querySelector('[data-action="preview"]');
+    previewBtn?.addEventListener('click', () => {
+      window.location.href = `/book-preview.html?id=${bookData.id}`;
+    });
+    
+    // Buy button
+    const buyBtn = card.querySelector('[data-action="buy"]');
+    buyBtn?.addEventListener('click', () => {
+      if (bookData.is_free) {
+        window.location.href = `/book-preview.html?id=${bookData.id}&mode=read`;
+      } else {
+        window.location.href = `/checkout.html?book_id=${bookData.id}`;
+      }
+    });
+    
+    // Wishlist button
+    const wishlistBtn = card.querySelector('[data-action="wishlist"]');
+    if (wishlistBtn) {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        // Check if already in wishlist
+        fetch(`/api/v1/users/wishlist/check?book_id=${bookData.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.in_wishlist) {
+            wishlistBtn.classList.add('active');
+          }
+        })
+        .catch(console.error);
+        
+        wishlistBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const isActive = wishlistBtn.classList.contains('active');
+          
+          try {
+            if (isActive) {
+              await fetch(`/api/v1/users/wishlist/${bookData.id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              wishlistBtn.classList.remove('active');
+              showToast('Removed from wishlist', 'info');
+            } else {
+              await fetch(`/api/v1/users/wishlist/${bookData.id}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              wishlistBtn.classList.add('active');
+              showToast('Added to wishlist', 'success');
+            }
+          } catch (error) {
+            console.error('Wishlist error:', error);
+            showToast('Something went wrong', 'error');
+          }
+        });
+      } else {
+        wishlistBtn.addEventListener('click', () => {
+          window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        });
+      }
+    }
+    
+    // Quick view
+    const quickViewBtn = card.querySelector('[data-action="quick-view"]');
+    quickViewBtn?.addEventListener('click', () => {
+      showQuickViewModal(bookData);
+    });
+  }
+  
+  function showQuickViewModal(bookData) {
+    // Create modal dynamically
+    const modal = document.createElement('div');
+    modal.className = 'quick-view-modal';
+    modal.innerHTML = `
+      <div class="quick-view-overlay"></div>
+      <div class="quick-view-container">
+        <button class="quick-view-close">×</button>
+        <div class="quick-view-content">
+          <div class="quick-view-cover">
+            <img src="${bookData.cover_image_url || '/images/default-book-cover.jpg'}" alt="${escapeHtml(bookData.title)}">
+          </div>
+          <div class="quick-view-info">
+            <h2>${escapeHtml(bookData.title)}</h2>
+            <p class="author">by ${escapeHtml(bookData.author_name)}</p>
+            <div class="rating">
+              <div class="stars" data-rating="${bookData.average_rating || 0}">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <span>${bookData.review_count || 0} reviews</span>
+            </div>
+            <p class="description">${escapeHtml(bookData.description || 'No description available.')}</p>
+            <div class="details">
+              <div><strong>Pages:</strong> ${bookData.total_pages || 'N/A'}</div>
+              <div><strong>Language:</strong> ${bookData.language || 'English'}</div>
+              <div><strong>Published:</strong> ${bookData.published_at ? new Date(bookData.published_at).toLocaleDateString() : 'N/A'}</div>
+            </div>
+            <div class="price">${bookData.is_free ? 'FREE' : `$${bookData.price.toFixed(2)}`}</div>
+            <div class="actions">
+              <button class="btn-preview">Preview Book</button>
+              <button class="btn-buy">${bookData.is_free ? 'Read Now' : 'Buy Now'}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    // Close modal
+    const close = () => {
+      modal.remove();
+      document.body.style.overflow = '';
+    };
+    
+    modal.querySelector('.quick-view-close')?.addEventListener('click', close);
+    modal.querySelector('.quick-view-overlay')?.addEventListener('click', close);
+    
+    // Action buttons
+    modal.querySelector('.btn-preview')?.addEventListener('click', () => {
+      window.location.href = `/book-preview.html?id=${bookData.id}`;
+    });
+    
+    modal.querySelector('.btn-buy')?.addEventListener('click', () => {
+      if (bookData.is_free) {
+        window.location.href = `/book-preview.html?id=${bookData.id}&mode=read`;
+      } else {
+        window.location.href = `/checkout.html?book_id=${bookData.id}`;
+      }
+    });
+  }
+  
+  function showToast(message, type) {
+    // Create toast element if it doesn't exist
+    let toast = document.querySelector('.global-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'global-toast';
+      document.body.appendChild(toast);
+      
+      // Add styles if not present
+      if (!document.querySelector('#toast-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'toast-styles';
+        styles.textContent = `
+          .global-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+          }
+          .global-toast.show {
+            opacity: 1;
+          }
+          .global-toast.success {
+            background: var(--success-color, #10b981);
+            color: white;
+          }
+          .global-toast.error {
+            background: var(--error-color, #ef4444);
+            color: white;
+          }
+        `;
+        document.head.appendChild(styles);
+      }
+    }
+    
+    toast.textContent = message;
+    toast.className = `global-toast ${type}`;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+  
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+})();
+</script>
