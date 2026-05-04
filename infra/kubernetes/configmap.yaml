@@ -1,0 +1,120 @@
+# =============================================================================
+# KUBERNETES CONFIGMAPS - Abdulboy Ebook Empire
+# =============================================================================
+---
+# Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: abdulboy-config
+  namespace: abdulboy-ebook
+data:
+  APP_NAME: "Abdulboy Ebook Empire"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  API_URL: "https://api.abdulboy-ebook.com"
+  WEB_URL: "https://abdulboy-ebook.com"
+  ADMIN_URL: "https://admin.abdulboy-ebook.com"
+  CORS_ALLOWED_ORIGINS: "https://abdulboy-ebook.com,https://www.abdulboy-ebook.com"
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_PERIOD: "60"
+  ENABLE_GAMIFICATION: "true"
+  ENABLE_WATERMARKING: "true"
+  ENABLE_OPTIMIZATION: "true"
+  JWT_ALGORITHM: "RS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+---
+# Nginx Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: abdulboy-ebook
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name _;
+        
+        location / {
+            root /usr/share/nginx/html;
+            try_files $uri $uri/ /index.html;
+            expires 1h;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        location /static {
+            alias /usr/share/nginx/html/static;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+---
+# Prometheus Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: abdulboy-ebook
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    scrape_configs:
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+---
+# Grafana Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: abdulboy-ebook
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus:9090
+      access: proxy
+      isDefault: true
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /etc/grafana/provisioning/dashboards
