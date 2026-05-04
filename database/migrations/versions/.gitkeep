@@ -1,0 +1,18 @@
+# Alembic Migration Versions Directory
+# 
+# This directory contains all database migration files.
+# 
+# Migration files are named with timestamp and description:
+# e.g., 20240101_120000_initial_migration.py
+# 
+# To create a new migration:
+#   alembic revision --autogenerate -m "description"
+# 
+# To apply migrations:
+#   alembic upgrade head
+# 
+# To rollback:
+#   alembic downgrade -1
+# 
+# Note: Do not modify existing migration files after they've been
+# applied to production. Create new migrations for changes.
