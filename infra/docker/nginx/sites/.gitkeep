@@ -1,0 +1,6 @@
+# Nginx Site Configuration Directory
+# Place your virtual host configuration files here
+#
+# Example: default.conf, abdulboy-ebook.com.conf, api.abdulboy-ebook.com.conf
+#
+# Default configuration will be created automatically
