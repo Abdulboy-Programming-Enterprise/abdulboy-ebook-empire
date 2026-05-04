@@ -1,0 +1,22 @@
+# Grafana Dashboards Directory
+# 
+# Place your dashboard JSON files here for automatic provisioning.
+# 
+# Available dashboards will be auto-loaded by Grafana.
+# 
+# Recommended dashboards:
+# - abdulboy-api-dashboard.json
+# - abdulboy-business-metrics.json
+# - abdulboy-database-monitoring.json
+# - abdulboy-nginx-performance.json
+# - abdulboy-celery-queue-monitoring.json
+# - abdulboy-payment-gateway-monitoring.json
+# 
+# Example dashboard JSON structure:
+# {
+#   "dashboard": {
+#     "title": "API Performance",
+#     "panels": [...],
+#     ...
+#   }
+# }
