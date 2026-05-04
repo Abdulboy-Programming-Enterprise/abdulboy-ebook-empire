@@ -1,0 +1,85 @@
+<!-- ========================================================================= -->
+<!-- SCROLL TO TOP BUTTON - Smooth Scroll Navigation -->
+<!-- ========================================================================= -->
+
+<button class="scroll-to-top" id="scroll-to-top" aria-label="Scroll to top" style="display: none;">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+  <span class="scroll-progress" id="scroll-progress">0%</span>
+</button>
+
+<style>
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+  z-index: 999;
+}
+
+.scroll-to-top:hover {
+  transform: translateY(-3px);
+  background: var(--primary-dark);
+}
+
+.scroll-progress {
+  font-size: 0.625rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .scroll-to-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const scrollBtn = document.getElementById('scroll-to-top');
+  const progressSpan = document.getElementById('scroll-progress');
+  
+  function updateScrollProgress() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight * 100) : 0;
+    
+    if (progressSpan) {
+      progressSpan.textContent = `${Math.round(progress)}%`;
+    }
+    
+    if (scrollBtn) {
+      scrollBtn.style.display = scrollTop > 300 ? 'flex' : 'none';
+    }
+  }
+  
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  window.addEventListener('scroll', updateScrollProgress);
+  scrollBtn?.addEventListener('click', scrollToTop);
+  
+  updateScrollProgress();
+})();
+</script>
