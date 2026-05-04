@@ -1,0 +1,150 @@
+# =============================================================================
+# SENTRY CONFIGURATION - Error Tracking
+# =============================================================================
+
+# Application configuration
+application: abdulboy-ebook-empire
+version: 1.0.0
+environment: production
+
+# Sentry DSN (to be injected via environment)
+dsn: ${SENTRY_DSN}
+
+# Release tracking
+release:
+  name: ${RELEASE_VERSION}
+  commit: ${GIT_COMMIT_SHA}
+  url: https://github.com/abdulboy/abdulboy-ebook-empire/commits/${GIT_COMMIT_SHA}
+
+# Performance monitoring
+performance:
+  traces_sample_rate: 0.1
+  profiles_sample_rate: 0.1
+  send_default_pii: false
+
+# Error grouping
+grouping:
+  enhance: true
+  fingerprint:
+    - {{ default }}
+    - error.value
+
+# Integrations
+integrations:
+  - name: django
+    enabled: true
+  - name: celery
+    enabled: true
+  - name: redis
+    enabled: true
+  - name: sqlalchemy
+    enabled: true
+  - name: logging
+    enabled: true
+    options:
+      level: ERROR
+      event_level: ERROR
+  - name: aws_lambda
+    enabled: false
+
+# Sampling rules
+sampling:
+  rules:
+    - name: ignore-health-checks
+      condition:
+        - transaction: "/health*"
+        - transaction: "/metrics"
+      sample_rate: 0.0
+    - name: api-transactions
+      condition:
+        - transaction: "/api/v1/*"
+      sample_rate: 0.2
+    - name: payment-transactions
+      condition:
+        - transaction: "/api/v1/payments/*"
+      sample_rate: 0.5
+    - name: admin-transactions
+      condition:
+        - transaction: "/admin/*"
+      sample_rate: 0.5
+    - name: default
+      sample_rate: 0.1
+
+# Breadcrumbs
+breadcrumbs:
+  enabled: true
+  max_count: 100
+  logging:
+    enabled: true
+    level: INFO
+
+# Context
+context:
+  enabled: true
+  user_context: true
+  tags_context: true
+  extra_context: true
+
+# Before send callback
+before_send: |
+  def before_send(event, hint):
+      # Remove sensitive data
+      if 'request' in event:
+          if 'headers' in event['request']:
+              # Remove authorization headers
+              if 'Authorization' in event['request']['headers']:
+                  del event['request']['headers']['Authorization']
+              if 'Cookie' in event['request']['headers']:
+                  del event['request']['headers']['Cookie']
+      
+      # Add custom tags
+      event['tags'] = event.get('tags', {})
+      event['tags']['project'] = 'abdulboy-ebook-empire'
+      event['tags']['team'] = 'backend'
+      
+      return event
+
+# Alert rules
+alerts:
+  - name: high-error-rate
+    conditions:
+      - type: event_frequency
+        interval: 5m
+        threshold: 50
+    actions:
+      - type: slack
+        channel: "#alerts-backend"
+        workspace: abdulboy-ebook
+
+  - name: critical-error
+    conditions:
+      - type: event_seen
+        level: fatal
+    actions:
+      - type: pagerduty
+        service_key: ${PAGERDUTY_KEY}
+      - type: slack
+        channel: "#alerts-critical"
+
+# Notification settings
+notifications:
+  slack:
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: "#monitoring"
+    username: "Sentry Bot"
+    icon_emoji: ":sentry:"
+  
+  email:
+    recipients:
+      - devops@abdulboy-ebook.com
+      - oncall@abdulboy-ebook.com
+    
+  pagerduty:
+    service_key: ${PAGERDUTY_KEY}
+    integration_key: ${PAGERDUTY_INTEGRATION_KEY}
+
+# Rate limiting
+rate_limits:
+  enabled: true
+  max_events_per_minute: 1000
+  max_events_per_ip: 100
