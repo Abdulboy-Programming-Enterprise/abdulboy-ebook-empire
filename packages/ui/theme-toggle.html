@@ -1,0 +1,242 @@
+<!-- ========================================================================= -->
+<!-- THEME TOGGLE - Dark/Light Mode Switch -->
+<!-- ========================================================================= -->
+
+<div class="theme-toggle" id="theme-toggle" data-component="theme-toggle">
+  <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+    <span class="theme-icon light-icon">🌞</span>
+    <span class="theme-icon dark-icon" style="display: none;">🌙</span>
+    <span class="theme-label">Dark Mode</span>
+  </button>
+  
+  <div class="theme-dropdown" id="theme-dropdown" style="display: none;">
+    <div class="theme-option" data-theme="light">
+      <span class="theme-option-icon">🌞</span>
+      <span class="theme-option-name">Light</span>
+      <span class="theme-option-check" style="display: none;">✓</span>
+    </div>
+    <div class="theme-option" data-theme="dark">
+      <span class="theme-option-icon">🌙</span>
+      <span class="theme-option-name">Dark</span>
+      <span class="theme-option-check" style="display: none;">✓</span>
+    </div>
+    <div class="theme-option" data-theme="system">
+      <span class="theme-option-icon">🖥️</span>
+      <span class="theme-option-name">System</span>
+      <span class="theme-option-check" style="display: none;">✓</span>
+    </div>
+    <div class="theme-option" data-theme="amoled">
+      <span class="theme-option-icon">⚫</span>
+      <span class="theme-option-name">AMOLED Dark</span>
+      <span class="theme-option-check" style="display: none;">✓</span>
+    </div>
+    <div class="theme-option" data-theme="sepia">
+      <span class="theme-option-icon">📜</span>
+      <span class="theme-option-name">Sepia</span>
+      <span class="theme-option-check" style="display: none;">✓</span>
+    </div>
+  </div>
+</div>
+
+<style>
+.theme-toggle {
+  position: relative;
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-hover);
+}
+
+.theme-label {
+  font-size: 0.875rem;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.theme-option:hover {
+  background: var(--bg-secondary);
+}
+
+.theme-option-icon {
+  font-size: 1.125rem;
+}
+
+.theme-option-name {
+  flex: 1;
+}
+
+.theme-option-check {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Theme definitions */
+body.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-hover: #eeeeee;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border-color: #e0e0e0;
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --accent-color: #ec4899;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+body.theme-dark {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-hover: #0f3460;
+  --text-primary: #eeeeee;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --border-color: #2a2a4a;
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --accent-color: #ec4899;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.25);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.3);
+}
+
+body.theme-amoled {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-hover: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --text-muted: #666666;
+  --border-color: #222222;
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --accent-color: #ec4899;
+}
+
+body.theme-sepia {
+  --bg-primary: #f4ecd8;
+  --bg-secondary: #e8dcc8;
+  --bg-hover: #ddd0b8;
+  --text-primary: #5b4636;
+  --text-secondary: #7a6548;
+  --text-muted: #9e8b6e;
+  --border-color: #d4c4a8;
+  --primary-color: #8b5cf6;
+  --secondary-color: #a78bfa;
+  --accent-color: #ec4899;
+}
+</style>
+
+<script>
+(function() {
+  const toggleBtn = document.getElementById('theme-toggle-btn');
+  const dropdown = document.getElementById('theme-dropdown');
+  const lightIcon = document.querySelector('.light-icon');
+  const darkIcon = document.querySelector('.dark-icon');
+  const themeLabel = document.querySelector('.theme-label');
+  
+  function setTheme(theme) {
+    // Remove existing theme classes
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-amoled', 'theme-sepia');
+    
+    if (theme === 'system') {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.body.classList.add(isDark ? 'theme-dark' : 'theme-light');
+    } else if (theme === 'amoled') {
+      document.body.classList.add('theme-amoled');
+    } else if (theme === 'sepia') {
+      document.body.classList.add('theme-sepia');
+    } else {
+      document.body.classList.add(`theme-${theme}`);
+    }
+    
+    localStorage.setItem('theme', theme);
+    
+    // Update UI icons
+    const isDarkMode = theme === 'dark' || theme === 'amoled' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (lightIcon && darkIcon) {
+      lightIcon.style.display = isDarkMode ? 'none' : 'inline';
+      darkIcon.style.display = isDarkMode ? 'inline' : 'none';
+    }
+    
+    if (themeLabel) {
+      themeLabel.textContent = theme === 'amoled' ? 'AMOLED' : theme === 'sepia' ? 'Sepia' : `${theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light'} Mode`;
+    }
+    
+    // Update active checkmarks
+    document.querySelectorAll('.theme-option-check').forEach(check => check.style.display = 'none');
+    const activeOption = document.querySelector(`.theme-option[data-theme="${theme}"] .theme-option-check`);
+    if (activeOption) activeOption.style.display = 'inline';
+  }
+  
+  // Toggle dropdown
+  toggleBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isVisible = dropdown.style.display === 'block';
+    dropdown.style.display = isVisible ? 'none' : 'block';
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+  });
+  
+  // Handle theme selection
+  document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const theme = option.dataset.theme;
+      setTheme(theme);
+      dropdown.style.display = 'none';
+    });
+  });
+  
+  // Load saved theme
+  const savedTheme = localStorage.getItem('theme') || 'system';
+  setTheme(savedTheme);
+  
+  // Watch for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'system') {
+      setTheme('system');
+    }
+  });
+})();
+</script>
