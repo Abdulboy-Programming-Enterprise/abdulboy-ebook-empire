@@ -1,0 +1,303 @@
+<!-- ========================================================================= -->
+<!-- NOTIFICATION TOAST - User Feedback Messages -->
+<!-- ========================================================================= -->
+
+<div class="toast-container" id="toast-container"></div>
+
+<style>
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toast {
+  min-width: 280px;
+  max-width: 400px;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.toast.toast-out {
+  animation: slideOut 0.3s ease forwards;
+}
+
+.toast-success {
+  border-left-color: var(--success-color, #10b981);
+}
+
+.toast-success .toast-icon {
+  color: var(--success-color, #10b981);
+}
+
+.toast-error {
+  border-left-color: var(--error-color, #ef4444);
+}
+
+.toast-error .toast-icon {
+  color: var(--error-color, #ef4444);
+}
+
+.toast-warning {
+  border-left-color: var(--warning-color, #f59e0b);
+}
+
+.toast-warning .toast-icon {
+  color: var(--warning-color, #f59e0b);
+}
+
+.toast-info {
+  border-left-color: var(--info-color, #3b82f6);
+}
+
+.toast-info .toast-icon {
+  color: var(--info-color, #3b82f6);
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.125rem;
+}
+
+.toast-message {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.toast-close:hover {
+  background: var(--bg-hover);
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--primary-color);
+  animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+  }
+  
+  .toast {
+    max-width: none;
+    width: auto;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const container = document.getElementById('toast-container');
+  let toastId = 0;
+  
+  // Icons for different toast types
+  const icons = {
+    success: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>`,
+    error: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>`,
+    warning: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v4M12 17h.01"></path>
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
+              </svg>`,
+    info: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>`
+  };
+  
+  // Titles for different toast types
+  const titles = {
+    success: 'Success',
+    error: 'Error',
+    warning: 'Warning',
+    info: 'Info'
+  };
+  
+  window.showToast = function(message, type = 'info', duration = 5000) {
+    const id = ++toastId;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.id = `toast-${id}`;
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">
+        <div class="toast-title">${titles[type]}</div>
+        <div class="toast-message">${escapeHtml(message)}</div>
+      </div>
+      <button class="toast-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="progress-bar" style="animation-duration: ${duration}ms"></div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after duration
+    const timeout = setTimeout(() => {
+      removeToast(toast);
+    }, duration);
+    
+    // Close button handler
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn?.addEventListener('click', () => {
+      clearTimeout(timeout);
+      removeToast(toast);
+    });
+    
+    // Pause auto-remove on hover
+    toast.addEventListener('mouseenter', () => {
+      clearTimeout(timeout);
+      const progressBar = toast.querySelector('.progress-bar');
+      if (progressBar) {
+        progressBar.style.animationPlayState = 'paused';
+      }
+    });
+    
+    toast.addEventListener('mouseleave', () => {
+      const remaining = duration - (Date.now() - startTime);
+      if (remaining > 0) {
+        const newTimeout = setTimeout(() => removeToast(toast), remaining);
+        toast.dataset.timeout = newTimeout;
+        const progressBar = toast.querySelector('.progress-bar');
+        if (progressBar) {
+          progressBar.style.animationPlayState = 'running';
+        }
+      } else {
+        removeToast(toast);
+      }
+    });
+    
+    const startTime = Date.now();
+    toast.dataset.timeout = timeout;
+    
+    return id;
+  };
+  
+  function removeToast(toast) {
+    const timeoutId = toast.dataset.timeout;
+    if (timeoutId) clearTimeout(parseInt(timeoutId));
+    
+    toast.classList.add('toast-out');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }
+  
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Global error handler for fetch responses
+  window.handleApiError = function(error, defaultMessage = 'Something went wrong') {
+    console.error('API Error:', error);
+    
+    let message = defaultMessage;
+    if (error.response?.data?.message) {
+      message = error.response.data.message;
+    } else if (error.message) {
+      message = error.message;
+    }
+    
+    showToast(message, 'error');
+  };
+  
+  // Success handler
+  window.handleApiSuccess = function(message = 'Operation completed successfully') {
+    showToast(message, 'success');
+  };
+})();
+</script>
