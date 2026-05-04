@@ -1,0 +1,140 @@
+# =============================================================================
+# KUBERNETES SERVICES - Abdulboy Ebook Empire
+# =============================================================================
+---
+# API Backend Service (Internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-api
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-api
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: abdulboy-api
+---
+# API Backend Service (External - for debugging)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-api-external
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-api
+    tier: backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: abdulboy-api
+---
+# Frontend Web Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-web
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-web
+    tier: frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 443
+    protocol: TCP
+    name: https
+  selector:
+    app: abdulboy-web
+---
+# Worker Service (Internal - for monitoring)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-worker
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-worker
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5555
+    targetPort: 5555
+    protocol: TCP
+    name: flower
+  selector:
+    app: abdulboy-worker
+---
+# PostgreSQL Service (Internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-postgres
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-postgres
+    tier: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: abdulboy-postgres
+---
+# Redis Service (Internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-redis
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-redis
+    tier: cache
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: redis
+  selector:
+    app: abdulboy-redis
+---
+# MongoDB Service (Internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: abdulboy-mongodb
+  namespace: abdulboy-ebook
+  labels:
+    app: abdulboy-mongodb
+    tier: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+    protocol: TCP
+    name: mongodb
+  selector:
+    app: abdulboy-mongodb
