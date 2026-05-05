@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "enabled": true,
+  "defaults": {
+    "opacity": 0.3,
+    "fontSize": 36,
+    "rotation": 45,
+    "position": "center",
+    "includeTimestamp": true,
+    "includeUserEmail": true,
+    "includePurchaseId": true
+  },
+  "textWatermarking": {
+    "enabled": true,
+    "method": "zero_width_chars",
+    "separator": "ZWJ"
+  },
+  "imageWatermarking": {
+    "enabled": true,
+    "methods": ["visible", "invisible"],
+    "visibleOpacity": 0.3,
+    "visiblePosition": "bottom_right",
+    "invisibleMethod": "lsb_steganography"
+  },
+  "pdfWatermarking": {
+    "enabled": true,
+    "method": "layer_overlay",
+    "supportedPages": "all"
+  },
+  "forensicHashing": {
+    "enabled": true,
+    "algorithm": "sha256",
+    "salt": "ABDULBOY_SEED_2026"
+  },
+  "drm": {
+    "enabled": true,
+    "expiryDays": 365,
+    "deviceLimit": 5,
+    "allowOffline": true
+  }
+}
