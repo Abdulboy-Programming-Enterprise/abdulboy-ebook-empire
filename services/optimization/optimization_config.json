@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "enabled": true,
+  "imageOptimization": {
+    "enabled": true,
+    "defaultQuality": 80,
+    "defaultFormat": "webp",
+    "responsiveSizes": {
+      "thumbnail": [150, 200],
+      "small": [300, 400],
+      "medium": [600, 800],
+      "large": [1200, 1600],
+      "hero": [1920, 1080]
+    },
+    "cacheLifetime": 86400
+  },
+  "assetPipeline": {
+    "enabled": true,
+    "minifyCss": true,
+    "minifyJs": true,
+    "bundleAssets": true,
+    "sourceMaps": false,
+    "cacheBusting": "hash"
+  },
+  "cacheStrategy": {
+    "enabled": true,
+    "defaultTtl": 300,
+    "cacheTags": ["books", "users", "payments", "static"],
+    "warmupEnabled": true,
+    "redisCluster": false
+  },
+  "cdnOptimization": {
+    "enabled": false,
+    "provider": "cloudflare",
+    "autoOptimize": true,
+    "imageResizing": true,
+    "webpConversion": true,
+    "preconnectEnabled": true
+  },
+  "lazyLoading": {
+    "enabled": true,
+    "threshold": "200px",
+    "placeholderEnabled": true
+  },
+  "criticalCss": {
+    "enabled": true,
+    "inlineCritical": true,
+    "deferNonCritical": true,
+    "generateOnBuild": true
+  }
+}
