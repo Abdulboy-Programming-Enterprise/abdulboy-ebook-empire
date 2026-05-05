@@ -1,0 +1,30 @@
+# =============================================================================
+# DEVELOPMENT REQUIREMENTS
+# =============================================================================
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-timeout==2.2.0
+pytest-xdist==3.5.0
+
+# Code Quality
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pylint==3.0.2
+
+# Debugging
+ipython==8.18.0
+ipdb==0.13.13
+
+# Mock Data
+factory-boy==3.3.0
+faker==20.1.0
+
+# Profiling
+py-spy==0.3.14
+memory-profiler==0.61.0
+line-profiler==4.1.2
