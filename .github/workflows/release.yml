@@ -1,159 +1,159 @@
-name: Create Release
+# name: Create Release
 
-on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number (e.g., 1.0.0)'
-        required: true
-        type: string
+# on:
+#   push:
+#     tags:
+#       - 'v*'
+#   workflow_dispatch:
+#     inputs:
+#       version:
+#         description: 'Version number (e.g., 1.0.0)'
+#         required: true
+#         type: string
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+# env:
+#   REGISTRY: ghcr.io
+#   IMAGE_NAME: ${{ github.repository }}
 
-jobs:
-  create-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+# jobs:
+#   create-release:
+#     name: Create GitHub Release
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
 
-      - name: Get version
-        id: version
-        run: |
-          if [[ -n "${{ github.event.inputs.version }}" ]]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-          fi
+#       - name: Get version
+#         id: version
+#         run: |
+#           if [[ -n "${{ github.event.inputs.version }}" ]]; then
+#             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+#           else
+#             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+#           fi
 
-      - name: Generate changelog
-        run: |
-          echo "# Release ${{ steps.version.outputs.version }}" > RELEASE_NOTES.md
-          echo "" >> RELEASE_NOTES.md
-          echo "## 🚀 What's New" >> RELEASE_NOTES.md
-          echo "" >> RELEASE_NOTES.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> RELEASE_NOTES.md
-          echo "" >> RELEASE_NOTES.md
-          echo "## 📦 Installation" >> RELEASE_NOTES.md
-          echo "" >> RELEASE_NOTES.md
-          echo "\`\`\`bash" >> RELEASE_NOTES.md
-          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:${{ steps.version.outputs.version }}" >> RELEASE_NOTES.md
-          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:${{ steps.version.outputs.version }}" >> RELEASE_NOTES.md
-          echo "\`\`\`" >> RELEASE_NOTES.md
+#       - name: Generate changelog
+#         run: |
+#           echo "# Release ${{ steps.version.outputs.version }}" > RELEASE_NOTES.md
+#           echo "" >> RELEASE_NOTES.md
+#           echo "## 🚀 What's New" >> RELEASE_NOTES.md
+#           echo "" >> RELEASE_NOTES.md
+#           git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> RELEASE_NOTES.md
+#           echo "" >> RELEASE_NOTES.md
+#           echo "## 📦 Installation" >> RELEASE_NOTES.md
+#           echo "" >> RELEASE_NOTES.md
+#           echo "\`\`\`bash" >> RELEASE_NOTES.md
+#           echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:${{ steps.version.outputs.version }}" >> RELEASE_NOTES.md
+#           echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:${{ steps.version.outputs.version }}" >> RELEASE_NOTES.md
+#           echo "\`\`\`" >> RELEASE_NOTES.md
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          body_path: RELEASE_NOTES.md
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          files: |
-            RELEASE_NOTES.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Create GitHub Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           tag_name: v${{ steps.version.outputs.version }}
+#           name: Release v${{ steps.version.outputs.version }}
+#           body_path: RELEASE_NOTES.md
+#           draft: false
+#           prerelease: false
+#           generate_release_notes: true
+#           files: |
+#             RELEASE_NOTES.md
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push-images:
-    name: Build and Push Release Images
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#   build-and-push-images:
+#     name: Build and Push Release Images
+#     runs-on: ubuntu-latest
+#     needs: create-release
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Get version
-        id: version
-        run: |
-          if [[ -n "${{ github.event.inputs.version }}" ]]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-          fi
+#       - name: Get version
+#         id: version
+#         run: |
+#           if [[ -n "${{ github.event.inputs.version }}" ]]; then
+#             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+#           else
+#             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+#           fi
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Log in to GitHub Container Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ${{ env.REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push API image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/api
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:${{ steps.version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:latest
-          labels: |
-            org.opencontainers.image.title=Abdulboy Ebook Empire API
-            org.opencontainers.image.version=${{ steps.version.outputs.version }}
-            org.opencontainers.image.created=$(date -Iseconds)
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+#       - name: Build and push API image
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: ./apps/api
+#           push: true
+#           tags: |
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:${{ steps.version.outputs.version }}
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:latest
+#           labels: |
+#             org.opencontainers.image.title=Abdulboy Ebook Empire API
+#             org.opencontainers.image.version=${{ steps.version.outputs.version }}
+#             org.opencontainers.image.created=$(date -Iseconds)
+#             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
-      - name: Build and push Web image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/web
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:${{ steps.version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:latest
-          labels: |
-            org.opencontainers.image.title=Abdulboy Ebook Empire Web
-            org.opencontainers.image.version=${{ steps.version.outputs.version }}
-            org.opencontainers.image.created=$(date -Iseconds)
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+#       - name: Build and push Web image
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: ./apps/web
+#           push: true
+#           tags: |
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:${{ steps.version.outputs.version }}
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:latest
+#           labels: |
+#             org.opencontainers.image.title=Abdulboy Ebook Empire Web
+#             org.opencontainers.image.version=${{ steps.version.outputs.version }}
+#             org.opencontainers.image.created=$(date -Iseconds)
+#             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
-  deploy-to-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: build-and-push-images
-    environment: staging
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+#   deploy-to-staging:
+#     name: Deploy to Staging
+#     runs-on: ubuntu-latest
+#     needs: build-and-push-images
+#     environment: staging
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: us-east-1
 
-      - name: Update ECS services
-        run: |
-          aws ecs update-service --cluster abdulboy-staging --service backend-api --force-new-deployment
-          aws ecs update-service --cluster abdulboy-staging --service frontend-web --force-new-deployment
+#       - name: Update ECS services
+#         run: |
+#           aws ecs update-service --cluster abdulboy-staging --service backend-api --force-new-deployment
+#           aws ecs update-service --cluster abdulboy-staging --service frontend-web --force-new-deployment
 
-  notify:
-    name: Send Release Notification
-    runs-on: ubuntu-latest
-    needs: [create-release, build-and-push-images]
-    steps:
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24
-        with:
-          payload: |
-            {
-              "text": "🎉 New Release v${{ needs.create-release.outputs.version }}!",
-              "blocks": [{
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Abdulboy Ebook Empire v${{ needs.create-release.outputs.version }} Released*\n\nView the release notes and download the latest version.\n<https://github.com/${{ github.repository }}/releases/tag/v${{ needs.create-release.outputs.version }}|View Release>"
-                }
-              }]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ANNOUNCEMENT_SLACK_WEBHOOK }}
+#   notify:
+#     name: Send Release Notification
+#     runs-on: ubuntu-latest
+#     needs: [create-release, build-and-push-images]
+#     steps:
+#       - name: Send Slack notification
+#         uses: slackapi/slack-github-action@v1.24
+#         with:
+#           payload: |
+#             {
+#               "text": "🎉 New Release v${{ needs.create-release.outputs.version }}!",
+#               "blocks": [{
+#                 "type": "section",
+#                 "text": {
+#                   "type": "mrkdwn",
+#                   "text": "*Abdulboy Ebook Empire v${{ needs.create-release.outputs.version }} Released*\n\nView the release notes and download the latest version.\n<https://github.com/${{ github.repository }}/releases/tag/v${{ needs.create-release.outputs.version }}|View Release>"
+#                 }
+#               }]
+#             }
+#         env:
+#           SLACK_WEBHOOK_URL: ${{ secrets.ANNOUNCEMENT_SLACK_WEBHOOK }}
