@@ -1,0 +1,14 @@
+# Custom Book Assets Directory
+# 
+# This directory stores assets for custom book orders.
+# 
+# Assets include:
+# - Reference materials uploaded by clients
+# - Draft chapters during writing process
+# - Final delivered books
+# 
+# Directory structure:
+# - {booking_id}/
+#   - reference/ (client uploads)
+#   - drafts/ (work in progress)
+#   - final/ (completed delivery)
