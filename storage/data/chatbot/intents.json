@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-04-24T00:00:00Z",
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "howdy"],
+      "responses": ["Hello! How can I help you today?", "Hi there! Welcome to Abdulboy Ebook Empire.", "Hey! What can I do for you?"],
+      "context": []
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["bye", "goodbye", "see you", "talk later", "have a good day"],
+      "responses": ["Goodbye! Happy reading!", "See you soon!", "Have a great day!"],
+      "context": []
+    },
+    {
+      "tag": "books",
+      "patterns": ["book", "books", "recommend", "suggest", "find books", "looking for"],
+      "responses": ["I can help you find books! What genre are you interested in?", "Would you like recommendations based on your reading history?"],
+      "context": ["genre_selection"]
+    },
+    {
+      "tag": "genre",
+      "patterns": ["fiction", "non-fiction", "mystery", "thriller", "romance", "sci-fi", "fantasy", "self-help", "business"],
+      "responses": ["Great choice! Let me find some {genre} books for you.", "I'll show you our best {genre} books."],
+      "context": ["book_recommendations"]
+    },
+    {
+      "tag": "pricing",
+      "patterns": ["price", "cost", "how much", "pricing", "expensive", "cheap", "discount"],
+      "responses": ["Books range from FREE to $49.99. Most books are between $9.99 and $29.99.", "We have frequent discounts and seasonal sales!"],
+      "context": []
+    },
+    {
+      "tag": "subscription",
+      "patterns": ["subscribe", "subscription", "membership", "plan", "monthly", "annual"],
+      "responses": ["We offer Free, Basic ($9.99/mo), and Premium ($19.99/mo) plans. Premium gives you unlimited access to all books!", "Would you like to see a comparison of our plans?"],
+      "context": []
+    },
+    {
+      "tag": "account",
+      "patterns": ["account", "profile", "settings", "change password", "update email"],
+      "responses": ["You can manage your account from the dashboard. Would you like me to direct you there?", "Account settings are available in your profile page."],
+      "context": []
+    },
+    {
+      "tag": "purchase",
+      "patterns": ["buy", "purchase", "checkout", "payment", "cart"],
+      "responses": ["You can purchase books directly from the book page. We accept all major credit cards and OPay.", "Need help with a purchase? I can guide you through checkout."],
+      "context": []
+    },
+    {
+      "tag": "custom_book",
+      "patterns": ["custom book", "write book", "hire writer", "ghostwrite", "personalized book"],
+      "responses": ["We offer custom book writing services! Tell me about your project and I'll connect you with our team.", "Custom books start at $199. Would you like to fill out a request form?"],
+      "context": []
+    },
+    {
+      "tag": "refund",
+      "patterns": ["refund", "return", "money back", "cancel order"],
+      "responses": ["We offer refunds within 30 days of purchase. Contact our support team for assistance.", "I can help you initiate a refund. Please provide your order number."],
+      "context": []
+    },
+    {
+      "tag": "support",
+      "patterns": ["help", "support", "assist", "contact", "customer service"],
+      "responses": ["I'm here to help! What issue are you experiencing?", "You can reach our support team at support@abdulboy-ebook.com or call +234 123 456 7890."],
+      "context": []
+    },
+    {
+      "tag": "fallback",
+      "patterns": [],
+      "responses": ["I'm not sure I understand. Could you please rephrase?", "Let me connect you with a human agent if you need more help.", "I'm still learning! Please try asking differently."],
+      "context": []
+    }
+  ]
+}
