@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="championGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="bgChampion" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle with glow effect -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgChampion)" stroke="url(#championGold)" stroke-width="5" filter="url(#shadow)"/>
+  
+  <!-- Crown icon -->
+  <g transform="translate(100, 70)" filter="url(#glow)">
+    <path d="M-30,25 L-25,-10 L-10,5 L0,-15 L10,5 L25,-10 L30,25 Z" fill="none" stroke="url(#championGold)" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="-25" cy="-10" r="3" fill="url(#championGold)"/>
+    <circle cx="0" cy="-15" r="4" fill="url(#championGold)"/>
+    <circle cx="25" cy="-10" r="3" fill="url(#championGold)"/>
+    <!-- Jewels -->
+    <circle cx="-10" cy="15" r="2" fill="#FF0000" opacity="0.8"/>
+    <circle cx="0" cy="18" r="3" fill="#00FF00" opacity="0.8"/>
+    <circle cx="10" cy="15" r="2" fill="#FF0000" opacity="0.8"/>
+  </g>
+  
+  <!-- Shield background -->
+  <g transform="translate(100, 120)">
+    <path d="M-30,15 L0,-20 L30,15 L30,25 L0,35 L-30,25 Z" fill="none" stroke="url(#championGold)" stroke-width="2.5" fill-opacity="0.2" fill="#FFD700"/>
+  </g>
+  
+  <!-- Star decorations -->
+  <polygon points="100,45 103,52 111,52 105,57 107,65 100,60 93,65 95,57 89,52 97,52" fill="url(#championGold)" opacity="0.9" filter="url(#glow)"/>
+  
+  <!-- Sparkle effects -->
+  <g opacity="0.6">
+    <circle cx="55" cy="90" r="2" fill="url(#championGold)"/>
+    <circle cx="145" cy="90" r="2" fill="url(#championGold)"/>
+    <circle cx="70" cy="145" r="1.5" fill="url(#championGold)"/>
+    <circle cx="130" cy="145" r="1.5" fill="url(#championGold)"/>
+    <circle cx="80" cy="50" r="1.5" fill="url(#championGold)"/>
+    <circle cx="120" cy="50" r="1.5" fill="url(#championGold)"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="url(#championGold)" letter-spacing="2">CHAMPION</text>
+</svg>
