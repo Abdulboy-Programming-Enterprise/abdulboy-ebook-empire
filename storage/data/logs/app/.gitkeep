@@ -1,0 +1,13 @@
+# Application Logs Directory
+# 
+# This directory stores application log files.
+# 
+# Log files:
+# - app.log (general application logs)
+# - error.log (error-level logs only)
+# - access.log (API access logs)
+# 
+# Rotation: Daily, keep 30 days
+# Format: JSON structured logging
+# 
+# DO NOT delete active log files while application is running.
