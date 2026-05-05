@@ -1,198 +1,198 @@
-name: Backup Database
+# name: Backup Database
 
-on:
-  schedule:
-    # Run daily at 1 AM
-    - cron: '0 1 * * *'
-  workflow_dispatch:
-    inputs:
-      backup_type:
-        description: 'Type of backup'
-        required: true
-        default: 'full'
-        type: choice
-        options:
-          - full
-          - incremental
-          - schema-only
+# on:
+#   schedule:
+#     # Run daily at 1 AM
+#     - cron: '0 1 * * *'
+#   workflow_dispatch:
+#     inputs:
+#       backup_type:
+#         description: 'Type of backup'
+#         required: true
+#         default: 'full'
+#         type: choice
+#         options:
+#           - full
+#           - incremental
+#           - schema-only
 
-env:
-  AWS_REGION: us-east-1
-  BACKUP_BUCKET: abdulboy-ebook-backups
+# env:
+#   AWS_REGION: us-east-1
+#   BACKUP_BUCKET: abdulboy-ebook-backups
 
-jobs:
-  backup-postgres:
-    name: Backup PostgreSQL Database
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+# jobs:
+#   backup-postgres:
+#     name: Backup PostgreSQL Database
+#     runs-on: ubuntu-latest
+#     environment: production
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+#       - name: Install PostgreSQL client
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y postgresql-client
 
-      - name: Create backup filename
-        id: filename
-        run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          echo "filename=abdulboy_ebook_backup_${TIMESTAMP}.sql.gz" >> $GITHUB_OUTPUT
-          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+#       - name: Create backup filename
+#         id: filename
+#         run: |
+#           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+#           echo "filename=abdulboy_ebook_backup_${TIMESTAMP}.sql.gz" >> $GITHUB_OUTPUT
+#           echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
 
-      - name: Backup PostgreSQL
-        run: |
-          PGPASSWORD=${{ secrets.DB_PASSWORD }} pg_dump \
-            -h ${{ secrets.DB_HOST }} \
-            -U ${{ secrets.DB_USER }} \
-            -d ${{ secrets.DB_NAME }} \
-            -Fc \
-            -f ${{ steps.filename.outputs.filename }}
-        env:
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+#       - name: Backup PostgreSQL
+#         run: |
+#           PGPASSWORD=${{ secrets.DB_PASSWORD }} pg_dump \
+#             -h ${{ secrets.DB_HOST }} \
+#             -U ${{ secrets.DB_USER }} \
+#             -d ${{ secrets.DB_NAME }} \
+#             -Fc \
+#             -f ${{ steps.filename.outputs.filename }}
+#         env:
+#           PGPASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      - name: Compress backup
-        run: |
-          gzip ${{ steps.filename.outputs.filename }}
+#       - name: Compress backup
+#         run: |
+#           gzip ${{ steps.filename.outputs.filename }}
 
-      - name: Upload to S3
-        run: |
-          aws s3 cp ${{ steps.filename.outputs.filename }}.gz \
-            s3://${{ env.BACKUP_BUCKET }}/postgresql/${{ steps.filename.outputs.timestamp }}/${{ steps.filename.outputs.filename }}.gz
+#       - name: Upload to S3
+#         run: |
+#           aws s3 cp ${{ steps.filename.outputs.filename }}.gz \
+#             s3://${{ env.BACKUP_BUCKET }}/postgresql/${{ steps.filename.outputs.timestamp }}/${{ steps.filename.outputs.filename }}.gz
 
-      - name: Apply lifecycle policy (keep 30 days)
-        run: |
-          aws s3 ls s3://${{ env.BACKUP_BUCKET }}/postgresql/ --recursive | \
-            awk '{print $4}' | \
-            while read -r file; do
-              date=$(echo $file | cut -d'/' -f2)
-              if [[ $(date -d "$date" +%s) -lt $(date -d "30 days ago" +%s) ]]; then
-                aws s3 rm s3://${{ env.BACKUP_BUCKET }}/$file
-              fi
-            done
+#       - name: Apply lifecycle policy (keep 30 days)
+#         run: |
+#           aws s3 ls s3://${{ env.BACKUP_BUCKET }}/postgresql/ --recursive | \
+#             awk '{print $4}' | \
+#             while read -r file; do
+#               date=$(echo $file | cut -d'/' -f2)
+#               if [[ $(date -d "$date" +%s) -lt $(date -d "30 days ago" +%s) ]]; then
+#                 aws s3 rm s3://${{ env.BACKUP_BUCKET }}/$file
+#               fi
+#             done
 
-  backup-redis:
-    name: Backup Redis Cache
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#   backup-redis:
+#     name: Backup Redis Cache
+#     runs-on: ubuntu-latest
+#     environment: production
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Install Redis CLI
-        run: sudo apt-get install -y redis-tools
+#       - name: Install Redis CLI
+#         run: sudo apt-get install -y redis-tools
 
-      - name: Create backup
-        run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          redis-cli -h ${{ secrets.REDIS_HOST }} -p 6379 --rdb dump.rdb
-          gzip dump.rdb
-          aws s3 cp dump.rdb.gz s3://${{ env.BACKUP_BUCKET }}/redis/backup_${TIMESTAMP}.rdb.gz
+#       - name: Create backup
+#         run: |
+#           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+#           redis-cli -h ${{ secrets.REDIS_HOST }} -p 6379 --rdb dump.rdb
+#           gzip dump.rdb
+#           aws s3 cp dump.rdb.gz s3://${{ env.BACKUP_BUCKET }}/redis/backup_${TIMESTAMP}.rdb.gz
 
-  backup-mongodb:
-    name: Backup MongoDB Analytics
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#   backup-mongodb:
+#     name: Backup MongoDB Analytics
+#     runs-on: ubuntu-latest
+#     environment: production
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Install MongoDB tools
-        run: |
-          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-          sudo apt-get update
-          sudo apt-get install -y mongodb-database-tools
+#       - name: Install MongoDB tools
+#         run: |
+#           wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+#           echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+#           sudo apt-get update
+#           sudo apt-get install -y mongodb-database-tools
 
-      - name: Backup MongoDB
-        run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          mongodump \
-            --host ${{ secrets.MONGODB_HOST }} \
-            --username ${{ secrets.MONGODB_USER }} \
-            --password ${{ secrets.MONGODB_PASSWORD }} \
-            --authenticationDatabase admin \
-            --db abdulboy_analytics \
-            --out ./backup_${TIMESTAMP}
-          tar -czf mongodb_backup_${TIMESTAMP}.tar.gz ./backup_${TIMESTAMP}
-          aws s3 cp mongodb_backup_${TIMESTAMP}.tar.gz s3://${{ env.BACKUP_BUCKET }}/mongodb/backup_${TIMESTAMP}.tar.gz
+#       - name: Backup MongoDB
+#         run: |
+#           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+#           mongodump \
+#             --host ${{ secrets.MONGODB_HOST }} \
+#             --username ${{ secrets.MONGODB_USER }} \
+#             --password ${{ secrets.MONGODB_PASSWORD }} \
+#             --authenticationDatabase admin \
+#             --db abdulboy_analytics \
+#             --out ./backup_${TIMESTAMP}
+#           tar -czf mongodb_backup_${TIMESTAMP}.tar.gz ./backup_${TIMESTAMP}
+#           aws s3 cp mongodb_backup_${TIMESTAMP}.tar.gz s3://${{ env.BACKUP_BUCKET }}/mongodb/backup_${TIMESTAMP}.tar.gz
 
-  backup-uploads:
-    name: Backup User Uploads
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#   backup-uploads:
+#     name: Backup User Uploads
+#     runs-on: ubuntu-latest
+#     environment: production
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Sync S3 uploads to backup bucket
-        run: |
-          aws s3 sync s3://abdulboy-ebook-uploads/ s3://${{ env.BACKUP_BUCKET }}/uploads/ --delete
+#       - name: Sync S3 uploads to backup bucket
+#         run: |
+#           aws s3 sync s3://abdulboy-ebook-uploads/ s3://${{ env.BACKUP_BUCKET }}/uploads/ --delete
 
-  verify-backup:
-    name: Verify Backups
-    runs-on: ubuntu-latest
-    needs: [backup-postgres, backup-redis, backup-mongodb, backup-uploads]
-    steps:
-      - name: Check backup sizes
-        run: |
-          echo "## Backup Verification Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Backup Type | Status | Size |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------------|--------|------|" >> $GITHUB_STEP_SUMMARY
+#   verify-backup:
+#     name: Verify Backups
+#     runs-on: ubuntu-latest
+#     needs: [backup-postgres, backup-redis, backup-mongodb, backup-uploads]
+#     steps:
+#       - name: Check backup sizes
+#         run: |
+#           echo "## Backup Verification Report" >> $GITHUB_STEP_SUMMARY
+#           echo "" >> $GITHUB_STEP_SUMMARY
+#           echo "| Backup Type | Status | Size |" >> $GITHUB_STEP_SUMMARY
+#           echo "|-------------|--------|------|" >> $GITHUB_STEP_SUMMARY
           
-          # Check PostgreSQL backup
-          POSTGRES_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/postgresql/ --recursive | sort -r | head -1 | awk '{print $3}')
-          echo "| PostgreSQL | ✅ Success | $(numfmt --to=iec $POSTGRES_SIZE) |" >> $GITHUB_STEP_SUMMARY
+#           # Check PostgreSQL backup
+#           POSTGRES_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/postgresql/ --recursive | sort -r | head -1 | awk '{print $3}')
+#           echo "| PostgreSQL | ✅ Success | $(numfmt --to=iec $POSTGRES_SIZE) |" >> $GITHUB_STEP_SUMMARY
           
-          # Check Redis backup  
-          REDIS_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/redis/ --recursive | sort -r | head -1 | awk '{print $3}')
-          echo "| Redis | ✅ Success | $(numfmt --to=iec $REDIS_SIZE) |" >> $GITHUB_STEP_SUMMARY
+#           # Check Redis backup  
+#           REDIS_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/redis/ --recursive | sort -r | head -1 | awk '{print $3}')
+#           echo "| Redis | ✅ Success | $(numfmt --to=iec $REDIS_SIZE) |" >> $GITHUB_STEP_SUMMARY
           
-          # Check MongoDB backup
-          MONGO_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/mongodb/ --recursive | sort -r | head -1 | awk '{print $3}')
-          echo "| MongoDB | ✅ Success | $(numfmt --to=iec $MONGO_SIZE) |" >> $GITHUB_STEP_SUMMARY
+#           # Check MongoDB backup
+#           MONGO_SIZE=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/mongodb/ --recursive | sort -r | head -1 | awk '{print $3}')
+#           echo "| MongoDB | ✅ Success | $(numfmt --to=iec $MONGO_SIZE) |" >> $GITHUB_STEP_SUMMARY
           
-          # Check Uploads backup
-          UPLOADS_COUNT=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/uploads/ --recursive | wc -l)
-          echo "| Uploads | ✅ Success | $UPLOADS_COUNT files |" >> $GITHUB_STEP_SUMMARY
+#           # Check Uploads backup
+#           UPLOADS_COUNT=$(aws s3 ls s3://${{ env.BACKUP_BUCKET }}/uploads/ --recursive | wc -l)
+#           echo "| Uploads | ✅ Success | $UPLOADS_COUNT files |" >> $GITHUB_STEP_SUMMARY
 
-  notify:
-    name: Send Backup Notification
-    runs-on: ubuntu-latest
-    needs: [backup-postgres, backup-redis, backup-mongodb, backup-uploads, verify-backup]
-    if: always()
-    steps:
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24
-        with:
-          payload: |
-            {
-              "text": "${{ needs.verify-backup.result == 'success' && '✅ Daily Backup Complete' || '❌ Backup Failed' }}",
-              "blocks": [{
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Database Backup Report*\nStatus: ${{ needs.verify-backup.result == 'success' && '✅ Success' || '❌ Failed' }}\nTime: $(date)\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
-                }
-              }]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ADMIN_SLACK_WEBHOOK }}
+#   notify:
+#     name: Send Backup Notification
+#     runs-on: ubuntu-latest
+#     needs: [backup-postgres, backup-redis, backup-mongodb, backup-uploads, verify-backup]
+#     if: always()
+#     steps:
+#       - name: Send Slack notification
+#         uses: slackapi/slack-github-action@v1.24
+#         with:
+#           payload: |
+#             {
+#               "text": "${{ needs.verify-backup.result == 'success' && '✅ Daily Backup Complete' || '❌ Backup Failed' }}",
+#               "blocks": [{
+#                 "type": "section",
+#                 "text": {
+#                   "type": "mrkdwn",
+#                   "text": "*Database Backup Report*\nStatus: ${{ needs.verify-backup.result == 'success' && '✅ Success' || '❌ Failed' }}\nTime: $(date)\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+#                 }
+#               }]
+#             }
+#         env:
+#           SLACK_WEBHOOK_URL: ${{ secrets.ADMIN_SLACK_WEBHOOK }}
