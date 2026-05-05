@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+name = "abdulboy-ebook-api"
+version = "1.0.0"
+description = "Backend API for Abdulboy Ebook Empire - World-class ebook platform"
+authors = [{name = "Abdulboy Programming Enterprise", email = "admin@abdulboy-ebook.com"}]
+license = {text = "Proprietary"}
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.scripts]
+abdulboy-api = "app.app:main"
+
+[tool.poetry]
+name = "abdulboy-ebook-api"
+version = "1.0.0"
+description = "Backend API for Abdulboy Ebook Empire"
+authors = ["Abdulboy Programming Enterprise <admin@abdulboy-ebook.com>"]
+license = "Proprietary"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+sqlalchemy = "^2.0.0"
+alembic = "^1.12.0"
+psycopg2-binary = "^2.9.0"
+redis = "^5.0.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+pydantic = {extras = ["email"], version = "^2.5.0"}
+email-validator = "^2.0.0"
+httpx = "^0.25.0"
+celery = "^5.3.0"
+stripe = "^7.0.0"
+boto3 = "^1.28.0"
+python-dotenv = "^1.0.0"
+loguru = "^0.7.0"
+sentry-sdk = {extras = ["fastapi"], version = "^1.39.0"}
+prometheus-client = "^0.19.0"
+opentelemetry-api = "^1.21.0"
+opentelemetry-sdk = "^1.21.0"
+opentelemetry-instrumentation-fastapi = "^0.42b0"
+python-dateutil = "^2.8.2"
+pytz = "^2023.3"
+PyJWT = "^2.8.0"
+cryptography = "^41.0.0"
+python-magic = "^0.4.27"
+PyPDF2 = "^3.0.0"
+reportlab = "^4.0.0"
+Pillow = "^10.0.0"
+qrcode = {extras = ["pil"], version = "^7.4.0"}
+jinja2 = "^3.1.0"
+aiosmtplib = "^2.0.0"
+sendgrid = "^6.10.0"
+flask = "^2.3.0"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.0"
+lxml = "^4.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+black = "^23.11.0"
+isort = "^5.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+pre-commit = "^3.5.0"
+httpx = "^0.25.0"
+faker = "^20.0.0"
+factory-boy = "^3.3.0"
+
+[tool.poetry.scripts]
+start = "app.app:main"
+dev = "uvicorn app.app:app --reload --host 0.0.0.0 --port 8000"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --cov=app --cov-report=term-missing --cov-report=html"
