@@ -1,0 +1,18 @@
+# Admin Actions Logs Directory
+# 
+# This directory stores audit logs of admin actions.
+# 
+# Each entry includes:
+# - Admin user ID and email
+# - Action type (CREATE, UPDATE, DELETE, etc.)
+# - Target entity type and ID
+# - Old values (before change)
+# - New values (after change)
+# - Timestamp
+# - IP address of admin
+# 
+# Retention: 2 years (security requirement)
+# Access: Restricted to compliance and security teams
+# Purpose: Forensics, audit trails, compliance reporting
+# 
+# DO NOT modify or delete for the retention period.
