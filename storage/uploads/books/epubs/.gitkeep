@@ -1,0 +1,13 @@
+# EPUB Files Directory
+# 
+# This directory stores uploaded EPUB ebook files.
+# 
+# Access is controlled via application authentication.
+# Files are organized by book ID subdirectories.
+# 
+# Example structure:
+# - {book_id}/
+#   - book.epub
+#   - metadata.json
+# 
+# All files are served through authenticated API endpoints.
