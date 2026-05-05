@@ -1,0 +1,57 @@
+/* =============================================================================
+   SWIPER CAROUSEL - Vendor Styles
+   ============================================================================= */
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--primary-color);
+  background: var(--bg-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 1rem;
+}
+
+.swiper-pagination-bullet {
+  background: var(--border-color);
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--primary-color);
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--primary-color);
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+}
+
+/* Dark mode adjustments */
+.dark-mode .swiper-button-next,
+.dark-mode .swiper-button-prev {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
