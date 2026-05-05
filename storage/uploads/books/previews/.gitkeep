@@ -1,0 +1,11 @@
+# Book Preview Files Directory
+# 
+# This directory stores generated preview files for books.
+# 
+# Preview files include:
+# - First N pages of PDF for sample reading
+# - Extracted text preview
+# - Thumbnail images
+# 
+# Files are automatically generated when a book is published.
+# Naming convention: {book_id}_preview.pdf or {book_id}_preview_{page}.jpg
