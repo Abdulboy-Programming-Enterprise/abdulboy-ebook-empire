@@ -1,0 +1,138 @@
+/* =============================================================================
+   DARK MODE STYLES - Optimized for AMOLED and Eye Comfort
+   ============================================================================= */
+
+/* Dark Mode Base */
+.dark-mode,
+.theme-dark {
+  --primary-color: #818cf8;
+  --primary-dark: #6366f1;
+  --primary-light: #a5b4fc;
+  --secondary-color: #a855f7;
+  --secondary-dark: #9333ea;
+  --accent-color: #f472b6;
+  
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #16213e;
+  --bg-hover: #1f1f3a;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --border-color: #2a2a4a;
+  --border-light: #1f1f3a;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* AMOLED Dark Mode (True Black) */
+.theme-amoled {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --bg-hover: #1f1f1f;
+  --border-color: #222222;
+}
+
+/* Sepia Mode (Reading Comfort) */
+.theme-sepia {
+  --bg-primary: #f4ecd8;
+  --bg-secondary: #e8dcc8;
+  --bg-tertiary: #ddd0b8;
+  --bg-hover: #e0d5c0;
+  --text-primary: #5b4636;
+  --text-secondary: #7a6548;
+  --text-muted: #9e8b6e;
+  --border-color: #d4c4a8;
+}
+
+/* Dark Mode Component Overrides */
+.dark-mode .card,
+.theme-dark .card,
+.theme-amoled .card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.dark-mode .header-top,
+.theme-dark .header-top {
+  background: var(--bg-secondary);
+}
+
+.dark-mode .modal-content,
+.theme-dark .modal-content {
+  background: var(--bg-primary);
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select,
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus,
+.theme-dark input:focus,
+.theme-dark textarea:focus {
+  border-color: var(--primary-color);
+}
+
+/* Dark Mode Scrollbar */
+.dark-mode ::-webkit-scrollbar,
+.theme-dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.dark-mode ::-webkit-scrollbar-track,
+.theme-dark ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb,
+.theme-dark ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover,
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Dark Mode Image Adjustments */
+.dark-mode img:not(.keep-original),
+.theme-dark img:not(.keep-original) {
+  filter: brightness(0.9);
+}
+
+/* Dark Mode Code Blocks */
+.dark-mode pre,
+.dark-mode code,
+.theme-dark pre,
+.theme-dark code {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Dark Mode Placeholder Text */
+.dark-mode ::placeholder,
+.theme-dark ::placeholder {
+  color: var(--text-muted);
+}
+
+/* Dark Mode Selection */
+.dark-mode ::selection,
+.theme-dark ::selection {
+  background: var(--primary-color);
+  color: white;
+}
