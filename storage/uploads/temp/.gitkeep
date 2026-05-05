@@ -1,0 +1,13 @@
+# Temporary Files Directory
+# 
+# This directory stores temporary files during processing.
+# 
+# Types of temp files:
+# - Uploaded files during compression/optimization
+# - Generated previews before storage
+# - Processing buffers for PDF operations
+# 
+# Cleaning policy:
+# - Files older than 24 hours are automatically deleted
+# - Cleanup runs hourly via Celery task
+# - DO NOT store permanent data here
