@@ -1,0 +1,184 @@
+/* =============================================================================
+   RESPONSIVE DESIGN - Mobile-First Breakpoints
+   ============================================================================= */
+
+/* Mobile (Default) */
+@media (max-width: 640px) {
+  /* Layout */
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Typography */
+  .hero-title {
+    font-size: 1.75rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem !important;
+  }
+  
+  /* Spacing */
+  .section-padding {
+    padding: 2rem 0 !important;
+  }
+  
+  /* Components */
+  .book-card {
+    width: 100% !important;
+  }
+  
+  .pricing-card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Modals */
+  .modal-content {
+    width: 95% !important;
+    margin: 1rem auto !important;
+  }
+  
+  /* Forms */
+  .form-row {
+    flex-direction: column;
+  }
+  
+  /* Navigation */
+  .main-nav {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    display: none;
+  }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Layout */
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Typography */
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+  
+  /* Components */
+  .book-card {
+    width: 100% !important;
+  }
+  
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  /* Layout */
+  .desktop-only {
+    display: block;
+  }
+  
+  /* Hover Effects */
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Sticky Elements */
+  .sticky-sidebar {
+    position: sticky;
+    top: 100px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* Print */
+@media print {
+  .no-print,
+  .site-header,
+  .site-footer,
+  .chatbot-widget,
+  .slideout-bar,
+  .scroll-to-top,
+  .cookie-consent {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    max-width: none;
+    padding: 0;
+  }
+  
+  a {
+    text-decoration: none;
+    color: black;
+  }
+}
+
+/* Dark Mode Specific */
+@media (prefers-color-scheme: dark) {
+  .theme-system {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+  }
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .btn,
+  .card,
+  .modal-content {
+    border: 2px solid currentColor;
+  }
+  
+  .btn-primary {
+    background: black;
+    color: white;
+  }
+}
