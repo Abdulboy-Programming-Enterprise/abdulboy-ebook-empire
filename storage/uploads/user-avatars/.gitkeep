@@ -1,0 +1,11 @@
+# User Avatar Images Directory
+# 
+# This directory stores user uploaded profile avatars.
+# 
+# Naming convention: {user_id}.{format}
+# Formats: JPEG, PNG, WebP
+# 
+# All avatars are:
+# - Resized to 200x200 maximum
+# - Optimized for web delivery
+# - Served through authenticated CDN
