@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD7F32"/>
+      <stop offset="100%" style="stop-color:#B87333"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bg)" stroke="url(#bronze)" stroke-width="4" filter="url(#shadow)"/>
+  
+  <!-- Quill / Author icon -->
+  <g transform="translate(100, 85)">
+    <!-- Quill -->
+    <path d="M-10,30 L0,-30 L15,-15 L15,5 Z" fill="none" stroke="url(#bronze)" stroke-width="2.5"/>
+    <!-- Ink drop -->
+    <circle cx="-10" cy="30" r="4" fill="url(#bronze)" opacity="0.8"/>
+    <!-- Feather lines -->
+    <line x1="0" y1="-30" x2="-15" y2="-10" stroke="url(#bronze)" stroke-width="1.5"/>
+    <line x1="-3" y1="-25" x2="-18" y2="-5" stroke="url(#bronze)" stroke-width="1.5"/>
+    <line x1="5" y1="-25" x2="12" y2="-5" stroke="url(#bronze)" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Laurel wreath decorations -->
+  <g transform="translate(100, 55)" opacity="0.7">
+    <path d="M-30,0 C-25,-15 -10,-20 0,-10 C10,-20 25,-15 30,0" fill="none" stroke="url(#bronze)" stroke-width="2"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="url(#bronze)">10</text>
+  <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" opacity="0.8">BOOKS WRITTEN</text>
+</svg>
