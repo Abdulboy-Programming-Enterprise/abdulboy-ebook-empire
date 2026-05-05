@@ -1,0 +1,36 @@
+# =============================================================================
+# ROBOTS.TXT - Search Engine Crawler Instructions
+# =============================================================================
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /user-dashboard.html
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /payment-*
+Disallow: /login.html
+Disallow: /signup.html
+Disallow: /reset-password.html
+Disallow: /change-password.html
+Disallow: /storage/
+Disallow: /uploads/
+
+# Sitemap location
+Sitemap: https://abdulboy-ebook.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 2
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
