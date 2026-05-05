@@ -1,0 +1,17 @@
+# Chatbot Context Cache Directory
+# 
+# This directory stores conversation context for active chat sessions.
+# 
+# File format: JSON
+# Naming: {session_id}.json
+# 
+# Each file contains:
+# - Conversation history
+# - Current intent
+# - Extracted entities
+# - User context (logged in status, subscription level)
+# 
+# Cache TTL: 30 minutes of inactivity
+# Cleanup: Automatic via Celery task
+# 
+# DO NOT manually modify files in this directory.
