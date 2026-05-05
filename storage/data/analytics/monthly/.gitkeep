@@ -1,0 +1,14 @@
+# Monthly Analytics Data Directory
+# 
+# This directory stores monthly aggregated analytics data.
+# 
+# File format: JSON
+# Naming: YYYY-MM.json
+# 
+# Data includes:
+# - Monthly revenue trends
+# - User growth metrics
+# - Subscription conversion rates
+# - Top selling categories
+# 
+# Retention: Permanent (archive)
