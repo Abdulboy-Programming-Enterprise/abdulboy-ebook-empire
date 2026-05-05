@@ -1,0 +1,19 @@
+# Error Logs Directory
+# 
+# This directory stores application error logs.
+# 
+# Error types:
+# - 4xx client errors
+# - 5xx server errors
+# - Unhandled exceptions
+# - Database connection errors
+# - Payment gateway failures
+# 
+# Each error entry includes:
+# - Full stack trace
+# - Request context
+# - User ID (if authenticated)
+# - Request ID for correlation
+# 
+# Retention: 90 days
+# Alert on: 5xx errors > threshold
