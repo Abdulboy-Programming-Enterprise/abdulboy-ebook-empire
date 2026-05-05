@@ -1,0 +1,16 @@
+# =============================================================================
+# TEST REQUIREMENTS
+# =============================================================================
+# Extends base.txt and development.txt for comprehensive testing
+# =============================================================================
+
+-r base.txt
+-r development.txt
+
+# Additional Test Tools
+locust==2.20.0
+playwright==1.40.0
+tox==4.11.3
+pytest-benchmark==4.0.0
+pytest-mock==3.12.0
+pytest-randomly==3.15.0
