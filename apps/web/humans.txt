@@ -1,0 +1,30 @@
+# =============================================================================
+# HUMANS.TXT - Credits and Team Information
+# =============================================================================
+
+/* TEAM */
+    Project Lead: Abdulrahman Adeeyo (Abdulboy)
+    Backend Developer: Abdulrahman Adeeyo
+    Frontend Developer: Abdulrahman Adeeyo
+    DevOps Engineer: Abdulrahman Adeeyo
+    UI/UX Designer: Abdulrahman Adeeyo
+
+/* COMPANY */
+    Name: Abdulboy Programming Enterprise
+    Location: Lagos, Nigeria
+    Website: https://abdulboy.com
+    Email: info@abdulboy.com
+
+/* TECHNOLOGY */
+    Backend: Python, FastAPI, PostgreSQL, Redis
+    Frontend: HTML5, CSS3, JavaScript, TailwindCSS
+    Infrastructure: Docker, Kubernetes, AWS, Terraform
+    Monitoring: Prometheus, Grafana, Sentry
+    Payments: Stripe, OPay, PayPal, Flutterwave
+
+/* LAST UPDATE */
+    Date: 2026-04-24
+    Version: 1.0.0
+
+/* THANKS */
+    Special thanks to all beta testers and early adopters!
