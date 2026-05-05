@@ -1,0 +1,15 @@
+# Access Logs Directory
+# 
+# This directory stores API access logs.
+# 
+# Each entry includes:
+# - Timestamp
+# - HTTP method and path
+# - Status code
+# - Response time
+# - Client IP
+# - User agent
+# - Request ID for tracing
+# 
+# Retention: 90 days
+# Use for: Performance analysis, security auditing, usage patterns
