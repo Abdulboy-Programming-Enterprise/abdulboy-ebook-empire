@@ -1,0 +1,11 @@
+# Book Thumbnail Images Directory
+# 
+# This directory stores resized thumbnail images for books.
+# 
+# Thumbnail sizes:
+# - thumb/ (150x200) - for book cards
+# - medium/ (300x400) - for search results
+# - large/ (600x800) - for book detail pages
+# 
+# Naming convention: {book_id}_{size}.{format}
+# Format: WebP for optimal compression
