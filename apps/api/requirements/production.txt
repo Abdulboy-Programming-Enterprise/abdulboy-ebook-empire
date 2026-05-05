@@ -1,0 +1,13 @@
+# =============================================================================
+# PRODUCTION REQUIREMENTS
+# =============================================================================
+# Extends base.txt with production-specific optimizations
+# =============================================================================
+
+-r base.txt
+
+# Performance
+gunicorn==21.2.0
+
+# Database Optimizations
+psycopg2==2.9.9  # binary version not recommended for production
