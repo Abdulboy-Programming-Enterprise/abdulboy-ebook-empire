@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-04-24T00:00:00Z",
+  "description": "Training data for recommendation models",
+  "data": {
+    "user_interactions": {
+      "total_users": 0,
+      "total_interactions": 0,
+      "sample": []
+    },
+    "purchase_history": {
+      "total_purchases": 0,
+      "unique_books": 0,
+      "sample": []
+    },
+    "book_metadata": {
+      "total_books": 0,
+      "features": ["author", "category", "price_range", "language"],
+      "sample": []
+    }
+  },
+  "notes": "This file is populated by the data collection pipeline. Actual training data is collected from user interactions, purchases, and book metadata."
+}
