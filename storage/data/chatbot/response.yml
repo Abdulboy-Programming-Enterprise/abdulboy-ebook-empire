@@ -1,0 +1,75 @@
+# =============================================================================
+# CHATBOT RESPONSES - YAML Format
+# =============================================================================
+
+version: "1.0.0"
+last_updated: "2026-04-24"
+
+responses:
+  greeting:
+    - "Hello! How can I help you today?"
+    - "Hi there! Welcome to Abdulboy Ebook Empire."
+    - "Hey! What can I do for you?"
+    - "Welcome back! Ready to discover your next favorite book?"
+  
+  goodbye:
+    - "Goodbye! Happy reading!"
+    - "See you soon! Don't forget to check out our new releases."
+    - "Have a great day! Come back anytime."
+  
+  books:
+    - "I can help you find books! What genre are you interested in?"
+    - "Would you like recommendations based on your reading history?"
+    - "Tell me what you like to read, and I'll find the perfect books for you."
+  
+  genre:
+    - "Great choice! Let me find some {genre} books for you."
+    - "I'll show you our best {genre} books. Here are the top picks:"
+    - "Based on your interest in {genre}, you might like these:"
+  
+  pricing:
+    - "Books range from FREE to $49.99. Most books are between $9.99 and $29.99."
+    - "We have frequent discounts and seasonal sales! Check our promotions page."
+    - "Premium subscription gives you unlimited access for just $19.99/month!"
+  
+  subscription:
+    - "We offer Free, Basic ($9.99/mo), and Premium ($19.99/mo) plans."
+    - "Premium gives you unlimited access to all books in our library!"
+    - "Would you like to see a comparison of our subscription plans?"
+  
+  account:
+    - "You can manage your account from the dashboard. Would you like me to direct you there?"
+    - "Account settings are available in your profile page."
+    - "Need to reset your password? I can send you a reset link."
+  
+  purchase:
+    - "You can purchase books directly from the book page. We accept all major credit cards and OPay."
+    - "Need help with a purchase? I can guide you through checkout."
+    - "Your purchased books are available in your library immediately after payment."
+  
+  custom_book:
+    - "We offer custom book writing services! Tell me about your project."
+    - "Custom books start at $199. Would you like to fill out a request form?"
+    - "Our professional writers can bring your book idea to life. Let's get started!"
+  
+  refund:
+    - "We offer refunds within 30 days of purchase. Contact our support team for assistance."
+    - "I can help you initiate a refund. Please provide your order number."
+    - "Refunds typically process within 5-7 business days."
+  
+  support:
+    - "I'm here to help! What issue are you experiencing?"
+    - "You can reach our support team at support@abdulboy-ebook.com"
+    - "Our support hours are Monday-Friday, 9 AM - 6 PM WAT."
+  
+  fallback:
+    - "I'm not sure I understand. Could you please rephrase?"
+    - "Let me connect you with a human agent if you need more help."
+    - "I'm still learning! Please try asking differently."
+    - "Can you provide more details about what you're looking for?"
+
+# Dynamic response templates
+templates:
+  book_recommendation: "Based on your interest in {genre}, I recommend: {books}"
+  welcome_back: "Welcome back, {name}! You have {days} days left in your subscription."
+  streak_reminder: "You're on a {days}-day reading streak! Keep it up!"
