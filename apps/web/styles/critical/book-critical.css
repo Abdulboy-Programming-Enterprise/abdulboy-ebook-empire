@@ -1,0 +1,73 @@
+/* =============================================================================
+   CRITICAL CSS - Above-the-Fold Book Page Styles
+   ============================================================================= */
+
+/* Book Detail Page */
+.book-detail {
+  padding: 2rem 0;
+}
+
+.book-detail-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.book-cover-large {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.book-cover-large img {
+  width: 100%;
+  height: auto;
+}
+
+.book-info h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.book-author {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.book-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.125rem;
+  color: #fbbf24;
+}
+
+.book-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 1rem 0;
+}
+
+.book-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .book-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-cover-large {
+    max-width: 250px;
+    margin: 0 auto;
+  }
+}
