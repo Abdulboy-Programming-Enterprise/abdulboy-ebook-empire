@@ -1,0 +1,23 @@
+# =============================================================================
+# PDF FILES SECURITY - Prevent direct access without authentication
+# =============================================================================
+
+# Deny direct access to all PDF files
+<Files *.pdf>
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Only allow access via PHP/Python scripts
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)$ /blocked.php [L]
+</IfModule>
+
+# Set appropriate headers for PDF files
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+    Header set Content-Disposition "inline"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
