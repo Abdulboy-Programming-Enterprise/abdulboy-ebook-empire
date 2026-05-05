@@ -1,0 +1,14 @@
+# Daily Analytics Data Directory
+# 
+# This directory stores daily aggregated analytics data.
+# 
+# File format: JSON
+# Naming: YYYY-MM-DD.json
+# 
+# Data includes:
+# - Daily active users
+# - Revenue by payment method
+# - Popular books
+# - User acquisition sources
+# 
+# Retention: 90 days
