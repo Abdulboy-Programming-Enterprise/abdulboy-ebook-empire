@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- =============================================================================
+     BROWSERCONFIG.XML - Windows Tile Configuration
+     ============================================================================= -->
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="/images/logo/mstile-150x150.png"/>
+      <square310x310logo src="/images/logo/mstile-310x310.png"/>
+      <wide310x150logo src="/images/logo/mstile-310x150.png"/>
+      <TileColor>#6366f1</TileColor>
+      <TileImage src="/images/logo/mstile-150x150.png"/>
+    </tile>
+    <notification>
+      <reminders>
+        <version>1.0</version>
+      </reminders>
+    </notification>
+  </msapplication>
+</browserconfig>
