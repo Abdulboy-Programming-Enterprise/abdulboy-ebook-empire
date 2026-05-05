@@ -1,0 +1,16 @@
+# Payment Logs Directory
+# 
+# This directory stores payment processing logs.
+# 
+# Log entries for:
+# - Payment intent creation
+# - Webhook receipts from Stripe/OPay
+# - Payment success/failure events
+# - Refund requests
+# - Fraud detection alerts
+# 
+# CRITICAL: These logs may contain PII and payment metadata
+# Access restricted to authorized personnel only
+# Retention: 1 year (compliance requirement)
+# 
+# DO NOT delete without compliance review.
