@@ -1,0 +1,11 @@
+# Export Files Directory
+# 
+# This directory stores generated export files for users.
+# 
+# Export types:
+# - Analytics reports (CSV, PDF, JSON)
+# - User data exports (GDPR compliance)
+# - Backup exports
+# 
+# Naming convention: {export_type}_{user_id}_{timestamp}.{format}
+# Files expire after 7 days and are auto-deleted.
