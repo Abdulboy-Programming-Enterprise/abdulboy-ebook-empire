@@ -1,0 +1,11 @@
+# Analytics Exports Directory
+# 
+# This directory stores generated analytics export files.
+# 
+# Export formats:
+# - CSV (spreadsheet compatible)
+# - JSON (API ready)
+# - PDF (report ready)
+# 
+# Naming: {report_type}_{date_range}_{timestamp}.{format}
+# Files expire after 30 days.
