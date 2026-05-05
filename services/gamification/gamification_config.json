@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-24",
+  "enabled": true,
+  "badges": {
+    "enabled": true,
+    "autoAward": true,
+    "rarities": ["common", "rare", "epic", "legendary"],
+    "maxBadgesPerUser": 100
+  },
+  "points": {
+    "enabled": true,
+    "multipliers": {
+      "purchase": 10,
+      "review": 50,
+      "dailyLogin": 10,
+      "bookCompleted": 100,
+      "streakBonus": 50,
+      "referral": 200,
+      "customBooking": 500
+    }
+  },
+  "leaderboard": {
+    "enabled": true,
+    "updateFrequency": "hourly",
+    "cacheTtl": 3600,
+    "maxEntries": 1000,
+    "periods": ["daily", "weekly", "monthly", "all_time"]
+  },
+  "challenges": {
+    "enabled": true,
+    "dailyChallenges": 3,
+    "weeklyChallenges": 3,
+    "autoRefresh": true,
+    "refreshHour": 0
+  },
+  "achievements": {
+    "enabled": true,
+    "categories": ["reading", "purchasing", "reviewing", "streak"],
+    "autoTrack": true
+  },
+  "notifications": {
+    "enabled": true,
+    "onBadgeEarned": true,
+    "onLevelUp": true,
+    "onChallengeComplete": true
+  }
+}
