@@ -1,0 +1,50 @@
+<!-- ========================================================================= -->
+<!-- NEWSLETTER SIGNUP - Email Subscription -->
+<!-- ========================================================================= -->
+
+<div class="newsletter-section">
+  <div class="newsletter-inner">
+    <div class="newsletter-icon">📧</div>
+    <h3>Stay in the Loop</h3>
+    <p>Subscribe to get updates on new releases and special offers.</p>
+    <form class="newsletter-form" id="newsletter-form">
+      <input type="email" placeholder="Your email address" required>
+      <button type="submit">Subscribe</button>
+    </form>
+    <div class="newsletter-success" style="display:none">✓ Thanks for subscribing!</div>
+  </div>
+</div>
+
+<style>
+.newsletter-section {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  color: white;
+  text-align: center;
+}
+.newsletter-inner { max-width: 500px; margin: 0 auto; }
+.newsletter-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.newsletter-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.newsletter-form input { flex: 1; padding: 0.75rem; border: none; border-radius: 50px; font-size: 1rem; }
+.newsletter-form button { padding: 0.75rem 1.5rem; background: white; color: var(--primary-color); border: none; border-radius: 50px; font-weight: 600; cursor: pointer; }
+.newsletter-success { margin-top: 1rem; padding: 0.5rem; background: rgba(255,255,255,0.2); border-radius: 50px; }
+@media (max-width: 768px) { .newsletter-form { flex-direction: column; } }
+</style>
+
+<script>
+document.getElementById('newsletter-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = e.target.querySelector('input').value;
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  btn.textContent = 'Subscribing...';
+  try {
+    await fetch('/api/v1/newsletter/subscribe', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+    e.target.style.display = 'none';
+    document.querySelector('.newsletter-success').style.display = 'block';
+  } catch(err) { alert('Subscription failed. Please try again.'); }
+  finally { btn.disabled = false; btn.textContent = 'Subscribe'; }
+});
+</script>
