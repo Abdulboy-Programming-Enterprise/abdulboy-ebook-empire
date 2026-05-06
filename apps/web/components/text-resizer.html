@@ -1,0 +1,72 @@
+<!-- ========================================================================= -->
+<!-- TEXT RESIZER - Accessibility Control -->
+<!-- ========================================================================= -->
+
+<div class="text-resizer">
+  <button class="resizer-btn" id="text-decrease" aria-label="Decrease text size">A-</button>
+  <span class="resizer-value" id="text-size-value">100%</span>
+  <button class="resizer-btn" id="text-increase" aria-label="Increase text size">A+</button>
+  <button class="resizer-reset" id="text-reset">Reset</button>
+</div>
+
+<style>
+.text-resizer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 30px;
+}
+.resizer-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+.resizer-btn:hover {
+  background: var(--bg-hover);
+}
+.resizer-value {
+  min-width: 45px;
+  text-align: center;
+  font-size: 0.875rem;
+}
+.resizer-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  padding: 0.25rem 0.5rem;
+}
+</style>
+
+<script>
+(function() {
+  let currentSize = parseInt(localStorage.getItem('text_size') || '100');
+  
+  function applySize(size) {
+    document.documentElement.style.fontSize = size + '%';
+    document.getElementById('text-size-value').textContent = size + '%';
+    localStorage.setItem('text_size', size);
+  }
+  
+  document.getElementById('text-increase')?.addEventListener('click', () => {
+    if (currentSize < 150) { currentSize += 5; applySize(currentSize); }
+  });
+  document.getElementById('text-decrease')?.addEventListener('click', () => {
+    if (currentSize > 75) { currentSize -= 5; applySize(currentSize); }
+  });
+  document.getElementById('text-reset')?.addEventListener('click', () => {
+    currentSize = 100;
+    applySize(currentSize);
+  });
+  
+  applySize(currentSize);
+})();
+</script>
