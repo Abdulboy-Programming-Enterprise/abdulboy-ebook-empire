@@ -1,0 +1,168 @@
+<!-- ========================================================================= -->
+<!-- HEADER COMPONENT - Main Navigation -->
+<!-- ========================================================================= -->
+<!-- This component is loaded dynamically via JavaScript -->
+<!-- ========================================================================= -->
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="container">
+      <div class="header-top-inner">
+        <div class="announcement-slider">
+          <div class="announcement-item">📚 Free shipping on all ebooks! Instant download.</div>
+          <div class="announcement-item">⭐ Subscribe to Premium and save 20% on all books!</div>
+          <div class="announcement-item">🎉 New releases every week. Stay tuned!</div>
+        </div>
+        <div class="header-actions">
+          <button class="action-btn text-resizer-btn" aria-label="Text size">Aa</button>
+          <button class="action-btn theme-toggle-btn" aria-label="Theme">🌓</button>
+          <select id="currency-select" class="currency-select" aria-label="Currency">
+            <option value="USD">USD ($)</option>
+            <option value="NGN">NGN (₦)</option>
+            <option value="EUR">EUR (€)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="header-main">
+    <div class="container">
+      <div class="header-main-inner">
+        <div class="logo">
+          <a href="/">
+            <img src="/images/logo/logo-light.svg" alt="Abdulboy Ebook Empire" class="logo-light" width="180" height="45">
+            <img src="/images/logo/logo-dark.svg" alt="Abdulboy Ebook Empire" class="logo-dark" style="display:none" width="180" height="45">
+          </a>
+        </div>
+        
+        <div class="search-bar">
+          <form action="/search" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Search by title, author, or ISBN..." aria-label="Search">
+            <button type="submit" aria-label="Submit search">🔍</button>
+          </form>
+        </div>
+        
+        <nav class="main-nav">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/ebook-site.html">Books</a></li>
+            <li><a href="/subscription-plans.html">Plans</a></li>
+            <li><a href="/custom-book-booking.html">Custom Book</a></li>
+            <li><a href="/about.html">About</a></li>
+          </ul>
+        </nav>
+        
+        <div class="user-actions">
+          <button class="cart-btn" id="cart-btn" aria-label="Cart">🛒<span class="cart-count">0</span></button>
+          <div class="auth-buttons" id="auth-buttons">
+            <a href="/login.html" class="btn btn-outline">Login</a>
+            <a href="/signup.html" class="btn btn-primary">Sign Up</a>
+          </div>
+          <div class="user-menu" id="user-menu" style="display:none">
+            <button class="user-menu-btn" id="user-menu-btn">
+              <img src="/images/default-avatar.png" alt="Avatar" class="user-avatar" width="40" height="40">
+              <span class="user-name">Guest</span>
+            </button>
+            <div class="user-dropdown">
+              <a href="/user-dashboard.html">Dashboard</a>
+              <a href="/user-dashboard.html#library">My Library</a>
+              <a href="/user-dashboard.html#subscription">Subscription</a>
+              <a href="/settings.html">Settings</a>
+              <button id="logout-btn">Logout</button>
+            </div>
+          </div>
+        </div>
+        
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mobile-nav" id="mobile-nav" style="display:none">
+    <div class="mobile-nav-inner">
+      <form action="/search" class="mobile-search">
+        <input type="text" name="q" placeholder="Search...">
+        <button type="submit">🔍</button>
+      </form>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/ebook-site.html">Books</a></li>
+        <li><a href="/subscription-plans.html">Plans</a></li>
+        <li><a href="/custom-book-booking.html">Custom Book</a></li>
+        <li><a href="/about.html">About</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+      </ul>
+      <div class="mobile-auth">
+        <a href="/login.html" class="btn btn-outline">Login</a>
+        <a href="/signup.html" class="btn btn-primary">Sign Up</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+.site-header {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.header-top { background: var(--bg-secondary); font-size: 0.875rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
+.header-top-inner { display: flex; justify-content: space-between; align-items: center; }
+.announcement-slider { overflow: hidden; flex: 1; }
+.announcement-item { animation: slideAnnouncement 12s linear infinite; }
+@keyframes slideAnnouncement { 0%,20%{transform:translateY(0)}25%,45%{transform:translateY(-30px)}50%,70%{transform:translateY(-60px)}75%,95%{transform:translateY(-90px)}100%{transform:translateY(0)} }
+.header-actions { display: flex; gap: 1rem; align-items: center; }
+.header-main { padding: 1rem 0; }
+.header-main-inner { display: flex; align-items: center; gap: 2rem; }
+.search-bar { flex: 1; max-width: 500px; }
+.search-form { display: flex; border: 2px solid var(--border-color); border-radius: 50px; overflow: hidden; }
+.search-form input { flex: 1; padding: 0.75rem 1rem; border: none; background: transparent; }
+.search-form button { padding: 0.75rem 1rem; background: none; border: none; cursor: pointer; }
+.main-nav ul { display: flex; gap: 1.5rem; list-style: none; margin:0; padding:0; }
+.user-actions { display: flex; align-items: center; gap: 1rem; }
+.cart-btn { position: relative; background: none; border: none; cursor: pointer; font-size: 1.25rem; }
+.cart-count { position: absolute; top: -8px; right: -12px; background: var(--primary-color); color: white; font-size:0.75rem; padding:2px 6px; border-radius:20px; }
+.user-menu { position: relative; }
+.user-menu-btn { display: flex; align-items: center; gap: 0.5rem; background: none; border: none; cursor: pointer; }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; }
+.user-dropdown { position: absolute; top: 100%; right: 0; background: var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; min-width:200px; display:none; }
+.user-menu:hover .user-dropdown { display:block; }
+.user-dropdown a, .user-dropdown button { display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); width:100%; text-align:left; background:none; border:none; cursor:pointer; }
+.mobile-menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+.mobile-nav { position: fixed; top: 0; left:0; width:100%; height:100%; background: var(--bg-primary); z-index:2000; padding:1rem; }
+@media (max-width:992px) { .main-nav, .user-actions .auth-buttons { display: none; } .mobile-menu-toggle { display: block; } }
+</style>
+
+<script>
+(function() {
+  const token = localStorage.getItem('access_token');
+  const userMenu = document.getElementById('user-menu');
+  const authBtns = document.getElementById('auth-buttons');
+  const userNameSpan = document.querySelector('.user-name');
+  
+  if (token && userMenu && authBtns) {
+    userMenu.style.display = 'block';
+    authBtns.style.display = 'none';
+    fetch('/api/v1/users/me', { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => { if(data.success && userNameSpan) userNameSpan.textContent = data.data.full_name; })
+      .catch(console.error);
+  }
+  
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/';
+  });
+  
+  const mobileToggle = document.getElementById('mobile-menu-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  mobileToggle?.addEventListener('click', () => {
+    const isOpen = mobileNav.style.display === 'block';
+    mobileNav.style.display = isOpen ? 'none' : 'block';
+  });
+})();
+</script>
