@@ -1,0 +1,62 @@
+<!-- ========================================================================= -->
+<!-- SCROLL TO TOP BUTTON -->
+<!-- ========================================================================= -->
+
+<button class="scroll-top-btn" id="scroll-top-btn" style="display:none" aria-label="Scroll to top">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<style>
+.scroll-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.3s, background 0.3s;
+  z-index: 999;
+}
+.scroll-top-btn:hover {
+  transform: translateY(-3px);
+  background: var(--primary-dark);
+}
+@media (max-width: 768px) {
+  .scroll-top-btn {
+    bottom: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const btn = document.getElementById('scroll-top-btn');
+  
+  function checkScroll() {
+    if (window.scrollY > 300) {
+      btn.style.display = 'flex';
+      btn.style.alignItems = 'center';
+      btn.style.justifyContent = 'center';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+  
+  btn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  
+  window.addEventListener('scroll', checkScroll);
+  checkScroll();
+})();
+</script>
