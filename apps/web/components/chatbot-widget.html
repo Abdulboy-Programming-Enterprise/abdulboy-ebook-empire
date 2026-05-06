@@ -1,0 +1,68 @@
+<!-- ========================================================================= -->
+<!-- CHATBOT WIDGET - AI Assistant -->
+<!-- ========================================================================= -->
+
+<div class="chatbot-widget">
+  <button class="chat-toggle" id="chat-toggle">💬</button>
+  <div class="chat-window" id="chat-window" style="display:none">
+    <div class="chat-header">Book Assistant <button id="chat-close">✕</button></div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="message bot">Hello! How can I help you today?</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chat-input" placeholder="Type your message...">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.chatbot-widget { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; }
+.chat-toggle { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.chat-window { position: absolute; bottom: 80px; right: 0; width: 350px; height: 450px; background: var(--bg-primary); border-radius: 16px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; overflow: hidden; }
+.chat-header { padding: 1rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; display: flex; justify-content: space-between; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.message { padding: 0.5rem 1rem; border-radius: 12px; max-width: 80%; }
+.message.bot { background: var(--bg-secondary); align-self: flex-start; }
+.message.user { background: var(--primary-color); color: white; align-self: flex-end; }
+.chat-input { display: flex; padding: 0.75rem; border-top: 1px solid var(--border-color); gap: 0.5rem; }
+.chat-input input { flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 20px; background: var(--bg-primary); }
+.chat-input button { padding: 0.5rem 1rem; background: var(--primary-color); border: none; border-radius: 20px; color: white; cursor: pointer; }
+@media (max-width: 768px) { .chat-window { width: calc(100vw - 2rem); right: -1rem; bottom: 70px; } }
+</style>
+
+<script>
+(function() {
+  const toggle = document.getElementById('chat-toggle');
+  const window = document.getElementById('chat-window');
+  const close = document.getElementById('chat-close');
+  const send = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+  
+  toggle?.addEventListener('click', () => { window.style.display = window.style.display === 'none' ? 'flex' : 'none'; });
+  close?.addEventListener('click', () => { window.style.display = 'none'; });
+  
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    messages.innerHTML += `<div class="message user">${escapeHtml(text)}</div>`;
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+    
+    try {
+      const res = await fetch('/api/v1/chatbot/message', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: text, session_id: localStorage.getItem('chat_session') }) });
+      const data = await res.json();
+      const reply = data.reply || "I'm sorry, I didn't understand that.";
+      messages.innerHTML += `<div class="message bot">${escapeHtml(reply)}</div>`;
+      if (data.session_id) localStorage.setItem('chat_session', data.session_id);
+      messages.scrollTop = messages.scrollHeight;
+    } catch(e) { messages.innerHTML += `<div class="message bot">Sorry, I'm having trouble connecting.</div>`; }
+  }
+  
+  send?.addEventListener('click', sendMessage);
+  input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+  
+  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+})();
+</script>
