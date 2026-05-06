@@ -1,0 +1,97 @@
+<!-- ========================================================================= -->
+<!-- BOOK CARD COMPONENT - Reusable Book Display -->
+<!-- ========================================================================= -->
+<!-- Replaces earlier component with enhanced features -->
+
+<div class="book-card" data-book-id="">
+  <div class="book-card-cover">
+    <img loading="lazy" alt="Book cover">
+    <div class="book-badges"></div>
+  </div>
+  <div class="book-card-info">
+    <h3 class="book-card-title"></h3>
+    <p class="book-card-author"></p>
+    <div class="book-card-rating">★★★★★</div>
+    <div class="book-card-price"></div>
+    <div class="book-card-actions">
+      <button class="action-preview">Preview</button>
+      <button class="action-buy">Buy Now</button>
+      <button class="action-wishlist" aria-label="Add to wishlist">❤️</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.book-card {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.book-card-cover { position: relative; aspect-ratio: 2/3; }
+.book-card-cover img { width: 100%; height: 100%; object-fit: cover; }
+.book-badges { position: absolute; top: 0.5rem; left: 0.5rem; display: flex; gap: 0.25rem; }
+.badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.688rem; font-weight: 600; }
+.badge-free { background: #10b981; color: white; }
+.badge-bestseller { background: #ec4899; color: white; }
+.badge-new { background: #6366f1; color: white; }
+.book-card-info { padding: 1rem; }
+.book-card-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem; }
+.book-card-author { font-size: 0.813rem; color: var(--text-secondary); margin: 0 0 0.5rem; }
+.book-card-rating { font-size: 0.75rem; color: #fbbf24; margin-bottom: 0.5rem; }
+.book-card-price { font-size: 1.125rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.75rem; }
+.book-card-actions { display: flex; gap: 0.5rem; }
+.book-card-actions button { padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+.action-preview { background: var(--bg-secondary); border: 1px solid var(--border-color); }
+.action-buy { background: var(--primary-color); border: none; color: white; }
+.action-wishlist { background: none; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; }
+</style>
+
+<script>
+// Book card initialization function
+window.initBookCard = function(card, bookData) {
+  card.dataset.bookId = bookData.id;
+  card.querySelector('.book-card-cover img').src = bookData.cover_image_url || '/images/default-book-cover.jpg';
+  card.querySelector('.book-card-cover img').alt = bookData.title;
+  card.querySelector('.book-card-title').textContent = bookData.title;
+  card.querySelector('.book-card-author').textContent = `by ${bookData.author_name}`;
+  card.querySelector('.book-card-price').textContent = bookData.is_free ? 'FREE' : `$${bookData.price.toFixed(2)}`;
+  
+  // Badges
+  const badgesContainer = card.querySelector('.book-badges');
+  if (bookData.is_free) badgesContainer.innerHTML += '<span class="badge badge-free">FREE</span>';
+  if (bookData.is_bestseller) badgesContainer.innerHTML += '<span class="badge badge-bestseller">Bestseller</span>';
+  if (bookData.is_new) badgesContainer.innerHTML += '<span class="badge badge-new">New</span>';
+  
+  // Rating stars
+  const rating = bookData.average_rating || 0;
+  const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+  card.querySelector('.book-card-rating').textContent = stars;
+  
+  // Actions
+  card.querySelector('.action-preview').addEventListener('click', () => {
+    window.location.href = `/book-preview.html?id=${bookData.id}`;
+  });
+  card.querySelector('.action-buy').addEventListener('click', () => {
+    if (bookData.is_free) {
+      window.location.href = `/book-preview.html?id=${bookData.id}&mode=read`;
+    } else {
+      window.location.href = `/checkout.html?book_id=${bookData.id}`;
+    }
+  });
+  card.querySelector('.action-wishlist').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const token = localStorage.getItem('access_token');
+    if (!token) { window.location.href = '/login.html'; return; }
+    const isWishlisted = card.querySelector('.action-wishlist').classList.contains('active');
+    const method = isWishlisted ? 'DELETE' : 'POST';
+    await fetch(`/api/v1/users/wishlist/${bookData.id}`, { method, headers: { 'Authorization': `Bearer ${token}` } });
+    card.querySelector('.action-wishlist').classList.toggle('active');
+  });
+};
+</script>
