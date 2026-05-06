@@ -1,0 +1,170 @@
+<!-- ========================================================================= -->
+<!-- SEARCH MODAL - Advanced Search Dialog -->
+<!-- ========================================================================= -->
+
+<div class="modal-overlay" id="search-modal" style="display:none">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>🔍 Search Books</h3>
+      <button class="modal-close" id="close-search-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="global-search-input" placeholder="Search by title, author, genre..." class="search-input-large">
+      <div class="search-filters">
+        <select id="search-category"><option value="">All Categories</option><option value="fiction">Fiction</option><option value="non-fiction">Non-Fiction</option><option value="programming">Programming</option><option value="self-help">Self-Help</option></select>
+        <select id="search-sort"><option value="relevance">Relevance</option><option value="newest">Newest</option><option value="price_asc">Price: Low to High</option><option value="price_desc">Price: High to Low</option></select>
+        <select id="search-availability"><option value="">All</option><option value="free">Free Only</option><option value="paid">Paid Only</option></select>
+      </div>
+      <div class="search-results" id="modal-search-results"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-container {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-body {
+  padding: 1rem;
+  overflow-y: auto;
+}
+.search-input-large {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  background: var(--bg-primary);
+}
+.search-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.search-filters select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+}
+.search-result-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.search-result-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.search-result-info { flex: 1; }
+.search-result-title { font-weight: 600; margin-bottom: 0.25rem; }
+.search-result-author { font-size: 0.813rem; color: var(--text-secondary); }
+.search-result-price { color: var(--primary-color); font-weight: 600; margin-top: 0.5rem; }
+</style>
+
+<script>
+(function() {
+  const modal = document.getElementById('search-modal');
+  const closeBtn = document.getElementById('close-search-modal');
+  const searchInput = document.getElementById('global-search-input');
+  const categorySelect = document.getElementById('search-category');
+  const sortSelect = document.getElementById('search-sort');
+  const availabilitySelect = document.getElementById('search-availability');
+  const resultsContainer = document.getElementById('modal-search-results');
+  
+  let searchTimeout;
+  
+  window.openSearchModal = () => {
+    modal.style.display = 'flex';
+    searchInput.focus();
+  };
+  
+  closeBtn?.addEventListener('click', () => modal.style.display = 'none');
+  modal?.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') modal.style.display = 'none'; });
+  
+  async function performSearch() {
+    const query = searchInput.value.trim();
+    if (!query) { resultsContainer.innerHTML = '<p>Enter a search term</p>'; return; }
+    const category = categorySelect.value;
+    const sort = sortSelect.value;
+    const availability = availabilitySelect.value;
+    
+    resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
+    
+    try {
+      let url = `/api/v1/books/search?q=${encodeURIComponent(query)}&limit=20`;
+      if (category) url += `&category=${category}`;
+      if (sort) url += `&sort=${sort}`;
+      if (availability === 'free') url += `&is_free=true`;
+      if (availability === 'paid') url += `&is_free=false`;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      if (data.success && data.data?.items?.length) {
+        resultsContainer.innerHTML = data.data.items.map(book => `
+          <div class="search-result-item">
+            <img src="${book.cover_image_url || '/images/default-book-cover.jpg'}" alt="${escapeHtml(book.title)}">
+            <div class="search-result-info">
+              <div class="search-result-title">${escapeHtml(book.title)}</div>
+              <div class="search-result-author">by ${escapeHtml(book.author_name)}</div>
+              <div class="search-result-price">${book.is_free ? 'FREE' : `$${book.price.toFixed(2)}`}</div>
+              <button class="view-book-btn" data-id="${book.id}" style="margin-top:0.5rem; padding:0.25rem 0.75rem; background:var(--primary-color); color:white; border:none; border-radius:4px; cursor:pointer;">View Book</button>
+            </div>
+          </div>
+        `).join('');
+        document.querySelectorAll('.view-book-btn').forEach(btn => {
+          btn.addEventListener('click', () => window.location.href = `/book-preview.html?id=${btn.dataset.id}`);
+        });
+      } else {
+        resultsContainer.innerHTML = '<p>No books found. Try different search terms.</p>';
+      }
+    } catch(e) {
+      resultsContainer.innerHTML = '<p>Error loading results. Please try again.</p>';
+      console.error(e);
+    }
+  }
+  
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(performSearch, 500);
+  });
+  categorySelect?.addEventListener('change', performSearch);
+  sortSelect?.addEventListener('change', performSearch);
+  availabilitySelect?.addEventListener('change', performSearch);
+  
+  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+})();
+</script>
