@@ -1,0 +1,73 @@
+<!-- ========================================================================= -->
+<!-- THEME TOGGLE - Light/Dark/AMOLED/Sepia -->
+<!-- ========================================================================= -->
+
+<div class="theme-toggle">
+  <button class="theme-toggle-btn" id="theme-toggle-btn">
+    <span class="theme-icon-light">🌞</span>
+    <span class="theme-icon-dark" style="display:none">🌙</span>
+  </button>
+  <div class="theme-dropdown" id="theme-dropdown" style="display:none">
+    <div data-theme="light">🌞 Light</div>
+    <div data-theme="dark">🌙 Dark</div>
+    <div data-theme="amoled">⚫ AMOLED</div>
+    <div data-theme="sepia">📜 Sepia</div>
+    <div data-theme="system">🖥️ System</div>
+  </div>
+</div>
+
+<style>
+.theme-toggle { position: relative; display: inline-block; }
+.theme-toggle-btn { background: none; border: none; cursor: pointer; font-size: 1.25rem; padding: 0.25rem 0.5rem; }
+.theme-dropdown { position: absolute; top: 100%; right: 0; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; min-width: 140px; box-shadow: var(--shadow-md); z-index: 1000; }
+.theme-dropdown div { padding: 0.5rem 1rem; cursor: pointer; transition: background 0.3s; }
+.theme-dropdown div:hover { background: var(--bg-hover); }
+</style>
+
+<script>
+(function() {
+  const btn = document.getElementById('theme-toggle-btn');
+  const dropdown = document.getElementById('theme-dropdown');
+  const lightIcon = document.querySelector('.theme-icon-light');
+  const darkIcon = document.querySelector('.theme-icon-dark');
+  
+  function setTheme(theme) {
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-amoled', 'theme-sepia');
+    if (theme === 'system') {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.body.classList.add(isDark ? 'theme-dark' : 'theme-light');
+    } else if (theme === 'amoled') {
+      document.body.classList.add('theme-amoled');
+    } else if (theme === 'sepia') {
+      document.body.classList.add('theme-sepia');
+    } else {
+      document.body.classList.add(`theme-${theme}`);
+    }
+    localStorage.setItem('theme', theme);
+    const isDarkMode = theme === 'dark' || theme === 'amoled' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (lightIcon && darkIcon) {
+      lightIcon.style.display = isDarkMode ? 'none' : 'inline';
+      darkIcon.style.display = isDarkMode ? 'inline' : 'none';
+    }
+  }
+  
+  btn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => dropdown.style.display = 'none');
+  document.querySelectorAll('.theme-dropdown div').forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setTheme(opt.dataset.theme);
+      dropdown.style.display = 'none';
+    });
+  });
+  
+  const saved = localStorage.getItem('theme') || 'system';
+  setTheme(saved);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (localStorage.getItem('theme') === 'system') setTheme('system');
+  });
+})();
+</script>
