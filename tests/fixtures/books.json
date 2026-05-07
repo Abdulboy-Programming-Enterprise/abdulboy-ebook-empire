@@ -1,0 +1,37 @@
+{
+  "books": [
+    {
+      "title": "The African Writer's Journey",
+      "author_name": "Chinua Adebayo",
+      "description": "A comprehensive guide for aspiring African writers.",
+      "price": 0,
+      "is_free": true,
+      "total_pages": 250,
+      "preview_pages": 50,
+      "language": "en",
+      "status": "published"
+    },
+    {
+      "title": "Python for Everyone",
+      "author_name": "Dr. Ada Okonkwo",
+      "description": "Master Python programming from scratch.",
+      "price": 29.99,
+      "is_free": false,
+      "total_pages": 450,
+      "preview_pages": 30,
+      "language": "en",
+      "status": "published"
+    },
+    {
+      "title": "Digital Marketing Mastery",
+      "author_name": "Sarah Johnson",
+      "description": "Proven digital marketing strategies.",
+      "price": 39.99,
+      "is_free": false,
+      "total_pages": 380,
+      "preview_pages": 35,
+      "language": "en",
+      "status": "published"
+    }
+  ]
+}
