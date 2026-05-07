@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Abdulboy Ebook Empire - World-class ebook platform with AI recommendations, multi-payment integration, and subscription services.">
+  <meta name="keywords" content="ebooks, digital books, African authors, online reading, book subscription">
+  <meta name="author" content="Abdulboy Programming Enterprise">
+  <meta property="og:title" content="Abdulboy Ebook Empire">
+  <meta property="og:description" content="Discover thousands of ebooks from African authors. Read online or offline with our subscription plans.">
+  <meta property="og:image" content="/images/og/home-og.jpg">
+  <meta property="og:url" content="https://abdulboy-ebook.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://abdulboy-ebook.com">
+  <link rel="icon" type="image/x-icon" href="/images/logo/favicon.ico">
+  <link rel="apple-touch-icon" href="/images/logo/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>Abdulboy Ebook Empire | World-Class Digital Publishing</title>
+  <style>
+    /* Critical CSS inline for fast rendering */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary)}
+    .hero{min-height:600px;display:flex;align-items:center;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
+    .container{max-width:1280px;margin:0 auto;padding:0 1rem}
+    .btn{display:inline-block;padding:0.75rem 1.5rem;border-radius:0.5rem;text-decoration:none;font-weight:500}
+    .btn-primary{background:white;color:#6366f1}
+    .btn-outline{background:transparent;border:2px solid white;color:white}
+  </style>
+</head>
+<body>
+  <!-- Components will be loaded dynamically -->
+  <div id="header-placeholder"></div>
+  
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">Discover Your Next Great Read</h1>
+          <p class="hero-subtitle">Thousands of ebooks from African authors. Read anywhere, anytime.</p>
+          <div class="hero-cta">
+            <a href="/ebook-site.html" class="btn btn-primary">Browse Books</a>
+            <a href="/subscription-plans.html" class="btn btn-outline">View Plans</a>
+          </div>
+          <div class="hero-stats">
+            <div><span class="stat-number">10,000+</span><br>Books</div>
+            <div><span class="stat-number">500+</span><br>Authors</div>
+            <div><span class="stat-number">50,000+</span><br>Readers</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="featured-books"><div class="container"><h2>Featured Books</h2><div id="featured-books-container" class="book-grid"></div></div></section>
+  </main>
+  
+  <div id="footer-placeholder"></div>
+  <div id="chatbot-placeholder"></div>
+  <div id="slideout-placeholder"></div>
+  
+  <script src="/scripts/main.js" defer></script>
+  <script>
+    fetch('/components/header.html').then(r=>r.text()).then(h=>document.getElementById('header-placeholder').innerHTML=h);
+    fetch('/components/footer.html').then(r=>r.text()).then(h=>document.getElementById('footer-placeholder').innerHTML=h);
+    fetch('/components/chatbot-widget.html').then(r=>r.text()).then(h=>document.getElementById('chatbot-placeholder').innerHTML=h);
+    fetch('/components/slideout-bar.html').then(r=>r.text()).then(h=>document.getElementById('slideout-placeholder').innerHTML=h);
+  </script>
+</body>
+</html>
