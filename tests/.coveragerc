@@ -1,0 +1,47 @@
+[run]
+# Coverage.py configuration
+
+# Source files to measure
+source = apps/api/app
+
+# Branch coverage
+branch = True
+
+# Omit files from coverage
+omit = 
+    */migrations/*
+    */tests/*
+    */__pycache__/*
+    */venv/*
+    */site-packages/*
+    */app/__init__.py
+    */app/main.py
+
+# Parallel mode for multiprocessing
+parallel = True
+
+[report]
+# Exclude lines from report
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if __name__ == .__main__.:
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if False:
+
+# Show missing lines
+show_missing = True
+
+# Precision for percentage
+precision = 2
+
+[html]
+# HTML report directory
+directory = htmlcov
+
+[xml]
+# XML report output
+output = coverage.xml
