@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup & Restore - Admin</title>
+  <link rel="stylesheet" href="/styles/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-sidebar">
+      <h3>📚 ABE Admin</h3>
+      <nav>
+        <a href="/admin/dashboard.html">Dashboard</a>
+        <a href="/admin/chatbot-training.html">Chatbot</a>
+        <a href="/admin/backup-restore.html" class="active">Backup & Restore</a>
+      </nav>
+    </div>
+    <div class="admin-main">
+      <h1>Backup & Restore</h1>
+      
+      <div class="backup-section">
+        <h2>Create Backup</h2>
+        <p>Create a full database backup including all users, books, and payments.</p>
+        <button id="create-backup" class="btn btn-primary">Create Backup Now</button>
+        <div id="backup-status"></div>
+      </div>
+      
+      <div class="restore-section">
+        <h2>Restore from Backup</h2>
+        <p>Upload a backup file to restore the database. Warning: This will overwrite current data.</p>
+        <form id="restore-form">
+          <input type="file" id="backup-file" accept=".sql,.gz">
+          <button type="submit" class="btn btn-warning">Restore Database</button>
+        </form>
+      </div>
+      
+      <div class="backups-list">
+        <h2>Available Backups</h2>
+        <table class="admin-table" id="backups-table">
+          <thead><tr><th>Filename</th><th>Size</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    const token = localStorage.getItem('access_token');
+    
+    async function loadBackups() {
+      try {
+        const res = await fetch('/api/v1/admin/backups', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+          const tbody = document.querySelector('#backups-table tbody');
+          tbody.innerHTML = data.data.map(b => `
+            <tr>
+              <td>${escapeHtml(b.filename)}</td>
+              <td>${(b.size / 1024 / 1024).toFixed(2)} MB</td>
+              <td>${new Date(b.date).toLocaleString()}</td>
+              <td><button class="restore-backup" data-file="${b.filename}">Restore</button><button class="download-backup" data-file="${b.filename}">Download</button></td>
+            </tr>
+          `).join('');
+          document.querySelectorAll('.restore-backup').forEach(btn => btn.addEventListener('click', () => restoreBackup(btn.dataset.file)));
+          document.querySelectorAll('.download-backup').forEach(btn => btn.addEventListener('click', () => downloadBackup(btn.dataset.file)));
+        }
+      } catch(e) { console.error(e); }
+    }
+    
+    async function createBackup() {
+      const btn = document.getElementById('create-backup');
+      const status = document.getElementById('backup-status');
+      btn.disabled = true;
+      status.textContent = 'Creating backup...';
+      try {
+        const res = await fetch('/api/v1/admin/backup/create', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { status.innerHTML = '✅ Backup created successfully!'; loadBackups(); }
+        else status.innerHTML = '❌ Backup failed';
+      } catch(e) { status.innerHTML = '❌ Error creating backup'; }
+      finally { btn.disabled = false; setTimeout(() => status.innerHTML = '', 3000); }
+    }
+    
+    async function restoreBackup(filename) {
+      if (!confirm(`Restore database from ${filename}? This will overwrite all current data.`)) return;
+      try {
+        const res = await fetch(`/api/v1/admin/backup/restore/${filename}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) alert('Database restored successfully. Page will reload.');
+        else alert('Restore failed');
+      } catch(e) { alert('Error restoring backup'); }
+    }
+    
+    function downloadBackup(filename) { window.open(`/api/v1/admin/backup/download/${filename}`, '_blank'); }
+    
+    document.getElementById('create-backup')?.addEventListener('click', createBackup);
+    document.getElementById('restore-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('backup-file').files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('backup', file);
+      try {
+        const res = await fetch('/api/v1/admin/backup/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+        if (res.ok) alert('Backup uploaded and restored');
+        else alert('Upload failed');
+      } catch(e) { alert('Error uploading backup'); }
+    });
+    
+    loadBackups();
+    function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  </script>
+</body>
+</html>
