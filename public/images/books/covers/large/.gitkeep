@@ -1,0 +1,3 @@
+# Large Book Cover Images Directory
+# Stores large-sized book cover images (600x800px)
+# Naming convention: {book_id}_large.webp
