@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard - Abdulboy Ebook Empire</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/dark-mode.css">
+  <link rel="stylesheet" href="/styles/admin.css">
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  <main class="dashboard-container">
+    <div class="dashboard-sidebar"><a href="#library">My Library</a><a href="#subscription">Subscription</a><a href="#bookmarks">Bookmarks</a><a href="#badges">Badges & Points</a><a href="#settings">Settings</a></div>
+    <div class="dashboard-main">
+      <div id="library" class="dashboard-section"><h2>My Library</h2><div id="library-list"></div></div>
+      <div id="subscription" class="dashboard-section"><h2>Subscription</h2><div id="subscription-info"></div><button id="manage-subscription">Manage Subscription</button></div>
+      <div id="badges" class="dashboard-section"><h2>Badges & Points</h2><div id="user-points">Points: 0</div><div id="user-badges"></div></div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script src="/scripts/auth.js"></script>
+  <script src="/scripts/user-dashboard.js"></script>
+</body>
+</html>
