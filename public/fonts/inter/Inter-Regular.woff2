@@ -1,0 +1,14 @@
+/* Inter Font - Regular (400) */
+/* WOFF2 format for modern browsers */
+/* Source: https://fonts.google.com/specimen/Inter */
+/* In production, download actual font files from Google Fonts */
+/* File size: ~50KB */
+/* CSS for using the font:
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter/Inter-Regular.woff2') format('woff2');
+}
+*/
