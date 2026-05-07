@@ -1,0 +1,3 @@
+# Medium Book Cover Images Directory
+# Stores medium-sized book cover images (300x400px)
+# Naming convention: {book_id}_medium.webp
