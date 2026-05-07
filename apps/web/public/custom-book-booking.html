@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Book Request - Abdulboy Ebook Empire</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/dark-mode.css">
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  <main class="container">
+    <div class="page-header"><h1>Request a Custom Book</h1><p>Get a professionally written book tailored to your needs</p></div>
+    <form id="custom-booking-form" class="booking-form">
+      <div class="form-group"><label>Book Title *</label><input type="text" name="title" required></div>
+      <div class="form-group"><label>Genre</label><select name="genre"><option>Fiction</option><option>Non-Fiction</option><option>Business</option><option>Self-Help</option></select></div>
+      <div class="form-group"><label>Word Count</label><input type="number" name="word_count" placeholder="e.g., 50000"></div>
+      <div class="form-group"><label>Budget (USD)</label><input type="number" name="budget" step="0.01"></div>
+      <div class="form-group"><label>Deadline</label><input type="date" name="deadline"></div>
+      <div class="form-group"><label>Description / Requirements</label><textarea name="description" rows="5" required></textarea></div>
+      <button type="submit" class="btn btn-primary">Submit Request</button>
+    </form>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script src="/scripts/custom-booking.js"></script>
+</body>
+</html>
