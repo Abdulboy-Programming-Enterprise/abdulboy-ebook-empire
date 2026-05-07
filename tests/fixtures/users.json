@@ -1,0 +1,29 @@
+{
+  "users": [
+    {
+      "email": "admin@abdulboy-ebook.com",
+      "full_name": "System Administrator",
+      "account_type": "admin",
+      "password": "Admin@123456"
+    },
+    {
+      "email": "special@abdulboy-ebook.com",
+      "full_name": "Special VIP User",
+      "account_type": "special",
+      "password": "Special@123456"
+    },
+    {
+      "email": "user@example.com",
+      "full_name": "Test Normal User",
+      "account_type": "normal",
+      "password": "User@123456"
+    },
+    {
+      "email": "premium@example.com",
+      "full_name": "Premium Subscriber",
+      "account_type": "normal",
+      "subscription_status": "premium",
+      "password": "Premium@123456"
+    }
+  ]
+}
