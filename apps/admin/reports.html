@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports - Admin Dashboard</title>
+  <link rel="stylesheet" href="/styles/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-sidebar">
+      <h3>📚 ABE Admin</h3>
+      <nav>
+        <a href="/admin/dashboard.html">Dashboard</a>
+        <a href="/admin/books-manager.html">Books</a>
+        <a href="/admin/users-manager.html">Users</a>
+        <a href="/admin/bookings-manager.html">Bookings</a>
+        <a href="/admin/reports.html" class="active">Reports</a>
+        <a href="/admin/backup-restore.html">Backup</a>
+      </nav>
+    </div>
+    <div class="admin-main">
+      <h1>Generate Reports</h1>
+      <div class="report-cards">
+        <div class="report-card">
+          <h3>Sales Report</h3>
+          <p>Export sales data by date range</p>
+          <input type="date" id="sales-start"><input type="date" id="sales-end">
+          <button id="export-sales" class="btn">Export CSV</button>
+        </div>
+        <div class="report-card">
+          <h3>User Report</h3>
+          <p>Export user registration data</p>
+          <input type="date" id="users-start"><input type="date" id="users-end">
+          <button id="export-users" class="btn">Export CSV</button>
+        </div>
+        <div class="report-card">
+          <h3>Subscription Report</h3>
+          <p>Export subscription analytics</p>
+          <button id="export-subscriptions" class="btn">Export CSV</button>
+        </div>
+        <div class="report-card">
+          <h3>Audit Log Report</h3>
+          <p>Export admin action logs</p>
+          <button id="export-audit" class="btn">Export CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const token = localStorage.getItem('access_token');
+    
+    async function exportReport(type, startDate = '', endDate = '') {
+      let url = `/api/v1/admin/reports/export/${type}`;
+      if (startDate && endDate) url += `?start=${startDate}&end=${endDate}`;
+      window.open(url, '_blank');
+    }
+    
+    document.getElementById('export-sales')?.addEventListener('click', () => {
+      const start = document.getElementById('sales-start').value;
+      const end = document.getElementById('sales-end').value;
+      exportReport('sales', start, end);
+    });
+    document.getElementById('export-users')?.addEventListener('click', () => {
+      const start = document.getElementById('users-start').value;
+      const end = document.getElementById('users-end').value;
+      exportReport('users', start, end);
+    });
+    document.getElementById('export-subscriptions')?.addEventListener('click', () => exportReport('subscriptions'));
+    document.getElementById('export-audit')?.addEventListener('click', () => exportReport('audit'));
+  </script>
+</body>
+</html>
