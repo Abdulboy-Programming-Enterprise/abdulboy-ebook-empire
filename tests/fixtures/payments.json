@@ -1,0 +1,32 @@
+{
+  "payments": [
+    {
+      "amount": 29.99,
+      "currency": "USD",
+      "payment_method": "stripe",
+      "item_type": "book",
+      "status": "completed"
+    },
+    {
+      "amount": 19.99,
+      "currency": "USD",
+      "payment_method": "stripe",
+      "item_type": "subscription",
+      "status": "completed"
+    },
+    {
+      "amount": 9.99,
+      "currency": "USD",
+      "payment_method": "opay",
+      "item_type": "book",
+      "status": "pending"
+    },
+    {
+      "amount": 49.99,
+      "currency": "USD",
+      "payment_method": "paypal",
+      "item_type": "book",
+      "status": "failed"
+    }
+  ]
+}
