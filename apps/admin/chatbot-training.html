@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Training - Admin</title>
+  <link rel="stylesheet" href="/styles/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-sidebar">
+      <h3>📚 ABE Admin</h3>
+      <nav>
+        <a href="/admin/dashboard.html">Dashboard</a>
+        <a href="/admin/chatbot-training.html" class="active">Chatbot Training</a>
+        <a href="/admin/backup-restore.html">Backup</a>
+      </nav>
+    </div>
+    <div class="admin-main">
+      <h1>Chatbot Training</h1>
+      <div class="training-intro">
+        <p>Add new intents and responses to train the AI chatbot.</p>
+      </div>
+      
+      <div class="add-intent">
+        <h3>Add New Intent</h3>
+        <form id="add-intent-form">
+          <div class="form-group"><label>Intent Name</label><input type="text" name="intent_name" required placeholder="e.g., pricing, refund, support"></div>
+          <div class="form-group"><label>Patterns (comma separated)</label><input type="text" name="patterns" required placeholder="how much does it cost, price, pricing"></div>
+          <div class="form-group"><label>Responses (comma separated)</label><input type="text" name="responses" required placeholder="Books cost $9.99, Our prices start at $9.99"></div>
+          <button type="submit" class="btn btn-primary">Add Intent</button>
+        </form>
+      </div>
+      
+      <h3>Existing Intents</h3>
+      <div id="intents-list"></div>
+    </div>
+  </div>
+  <script>
+    const token = localStorage.getItem('access_token');
+    
+    async function loadIntents() {
+      try {
+        const res = await fetch('/api/v1/admin/chatbot/intents', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+          const container = document.getElementById('intents-list');
+          container.innerHTML = data.data.map(intent => `
+            <div class="intent-card">
+              <h4>${escapeHtml(intent.tag)}</h4>
+              <p><strong>Patterns:</strong> ${intent.patterns.join(', ')}</p>
+              <p><strong>Responses:</strong> ${intent.responses.join(', ')}</p>
+              <button class="delete-intent" data-tag="${intent.tag}">Delete</button>
+            </div>
+          `).join('');
+          document.querySelectorAll('.delete-intent').forEach(btn => btn.addEventListener('click', () => deleteIntent(btn.dataset.tag)));
+        }
+      } catch(e) { console.error(e); }
+    }
+    
+    async function addIntent(intentName, patterns, responses) {
+      try {
+        const res = await fetch('/api/v1/admin/chatbot/intents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ tag: intentName, patterns: patterns.split(',').map(p => p.trim()), responses: responses.split(',').map(r => r.trim()) })
+        });
+        if (res.ok) { alert('Intent added'); loadIntents(); }
+        else alert('Failed to add intent');
+      } catch(e) { alert('Error adding intent'); }
+    }
+    
+    async function deleteIntent(tag) {
+      if (!confirm(`Delete intent "${tag}"?`)) return;
+      try {
+        const res = await fetch(`/api/v1/admin/chatbot/intents/${tag}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) { alert('Intent deleted'); loadIntents(); }
+      } catch(e) { console.error(e); }
+    }
+    
+    document.getElementById('add-intent-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      addIntent(e.target.intent_name.value, e.target.patterns.value, e.target.responses.value);
+      e.target.reset();
+    });
+    
+    loadIntents();
+    function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  </script>
+</body>
+</html>
