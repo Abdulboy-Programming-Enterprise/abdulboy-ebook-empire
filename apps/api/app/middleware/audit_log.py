@@ -48,8 +48,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                 body = body_bytes.decode("utf-8")[:1000]  # Limit size
                 # Reconstruct request body
                 request._body = body_bytes
-            except Exception:
-                pass
+            except Exception as e:
+                # Best-effort body capture for audit logging; never block request flow.
+                logger.debug(f"Skipping request body audit capture due to parse/read error: {e}")
         
         response = await call_next(request)
         
