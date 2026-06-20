@@ -106,8 +106,8 @@ class CDNOptimizer:
             if os.path.exists(asset_path):
                 mtime = os.path.getmtime(asset_path)
                 return str(int(mtime))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug(f"Failed to get asset mtime for versioning: path={asset_path}, error={exc}")
         
         return str(datetime.utcnow().timestamp())[:10]
     
