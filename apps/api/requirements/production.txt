@@ -7,7 +7,7 @@
 -r base.txt
 
 # Performance
-gunicorn==21.2.0
+gunicorn==22.0.0
 
 # Database Optimizations
 psycopg2==2.9.9  # binary version not recommended for production
