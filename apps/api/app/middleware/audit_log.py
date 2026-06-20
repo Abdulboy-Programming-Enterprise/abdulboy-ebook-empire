@@ -45,9 +45,10 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         if request.method in ["POST", "PUT", "PATCH"]:
             try:
                 body_bytes = await request.body()
-                body = body_bytes.decode("utf-8")[:1000]  # Limit size
-                # Reconstruct request body
-                request._body = body_bytes
+                truncated_body_bytes = body_bytes[:1000]  # Limit size
+                body = truncated_body_bytes.decode("utf-8", errors="replace")
+                # Reconstruct request body with bounded payload to avoid exposing full sensitive data
+                request._body = truncated_body_bytes
             except Exception as e:
                 # Best-effort body capture for audit logging; never block request flow.
                 logger.debug(f"Skipping request body audit capture due to parse/read error: {e}")
@@ -84,21 +85,24 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             # Create audit log entry (async)
             db = SessionLocal()
             try:
+                path_segments = [segment for segment in request.url.path.split("/") if segment]
+                target_type = path_segments[-2] if len(path_segments) >= 2 else None
+
                 audit = AuditLog(
                     admin_id=user_id,
                     admin_email=None,  # Would fetch from user service
                     action_type=request.method,
-                    target_type=request.url.path.split("/")[-2] if request.url.path.split("/") else None,
+                    target_type=target_type,
                     ip_address=request.client.host if request.client else None,
                     user_agent=request.headers.get("User-Agent"),
                     created_at=datetime.utcnow(),
                 )
                 db.add(audit)
-                await db.commit()
+                db.commit()
             except Exception as e:
                 logger.error(f"Failed to create audit log: {e}")
             finally:
-                await db.close()
+                db.close()
                 
         except Exception as e:
             logger.error(f"Audit logging failed: {e}")
