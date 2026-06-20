@@ -30,7 +30,7 @@ sqlalchemy = "^2.0.0"
 alembic = "^1.12.0"
 psycopg2-binary = "^2.9.0"
 redis = "^5.0.0"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-jose = {extras = ["cryptography"], version = "^3.4.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-multipart = "^0.0.6"
 pydantic = {extras = ["email"], version = "^2.5.0"}
