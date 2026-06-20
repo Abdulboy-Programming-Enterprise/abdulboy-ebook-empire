@@ -94,11 +94,11 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                     created_at=datetime.utcnow(),
                 )
                 db.add(audit)
-                await db.commit()
+                db.commit()
             except Exception as e:
                 logger.error(f"Failed to create audit log: {e}")
             finally:
-                await db.close()
+                db.close()
                 
         except Exception as e:
             logger.error(f"Audit logging failed: {e}")
