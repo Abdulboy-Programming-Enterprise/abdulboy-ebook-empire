@@ -21,7 +21,7 @@
     "chart.js": "^4.4.0",
     "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
-    "swiper": "^11.0.0"
+    "swiper": "^12.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
