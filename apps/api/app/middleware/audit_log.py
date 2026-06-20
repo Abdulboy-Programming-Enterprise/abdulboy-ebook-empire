@@ -84,11 +84,14 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             # Create audit log entry (async)
             db = SessionLocal()
             try:
+                path_segments = [segment for segment in request.url.path.split("/") if segment]
+                target_type = path_segments[-2] if len(path_segments) >= 2 else None
+
                 audit = AuditLog(
                     admin_id=user_id,
                     admin_email=None,  # Would fetch from user service
                     action_type=request.method,
-                    target_type=request.url.path.split("/")[-2] if request.url.path.split("/") else None,
+                    target_type=target_type,
                     ip_address=request.client.host if request.client else None,
                     user_agent=request.headers.get("User-Agent"),
                     created_at=datetime.utcnow(),
