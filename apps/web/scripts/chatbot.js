@@ -8,6 +8,7 @@ class ChatbotWidget {
     this.sessionId = localStorage.getItem('chat_session_id') || this.generateSessionId();
     this.messageHistory = [];
     this.typingTimeout = null;
+    this.unreadCount = 0;
   }
   
   init() {
@@ -16,11 +17,44 @@ class ChatbotWidget {
     this.updateUnreadCount();
   }
   
+  // ===========================================================================
+  // SECURE SESSION ID GENERATION - CRYPTOGRAPHICALLY SECURE
+  // ===========================================================================
+  
+  /**
+   * Generates a cryptographically secure session ID
+   * Uses crypto.randomUUID() if available, falls back to crypto.getRandomValues()
+   * @returns {string} Secure session ID
+   */
   generateSessionId() {
-    const sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    let sessionId;
+    
+    // Option 1: Use crypto.randomUUID() (modern browsers, Node.js 14+)
+    if (window.crypto && window.crypto.randomUUID) {
+      sessionId = 'chat_' + crypto.randomUUID();
+    } 
+    // Option 2: Fallback to crypto.getRandomValues() (all modern browsers)
+    else if (window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint8Array(16);
+      crypto.getRandomValues(array);
+      sessionId = 'chat_' + Array.from(array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    } 
+    // Option 3: Last resort fallback (should never happen in modern browsers)
+    else {
+      // Use a combination of timestamp and random (less secure but better than nothing)
+      sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      console.warn('Crypto API not available, using fallback RNG');
+    }
+    
     localStorage.setItem('chat_session_id', sessionId);
     return sessionId;
   }
+  
+  // ===========================================================================
+  // EVENT SETUP
+  // ===========================================================================
   
   setupEventListeners() {
     const toggleBtn = document.getElementById('chat-toggle-btn');
@@ -60,6 +94,10 @@ class ChatbotWidget {
     });
   }
   
+  // ===========================================================================
+  // CHAT UI CONTROLS
+  // ===========================================================================
+  
   toggleChat() {
     this.isOpen = !this.isOpen;
     const chatWindow = document.getElementById('chat-window');
@@ -94,6 +132,10 @@ class ChatbotWidget {
     if (closeIcon) closeIcon.style.display = 'none';
   }
   
+  // ===========================================================================
+  // MESSAGE SENDING
+  // ===========================================================================
+  
   async sendMessage(message = null) {
     const input = document.getElementById('chat-input');
     const messageText = message || input?.value.trim();
@@ -120,6 +162,10 @@ class ChatbotWidget {
         })
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       // Hide typing indicator
@@ -144,7 +190,17 @@ class ChatbotWidget {
     }
   }
   
-  addMessage(text, sender) {
+  // ===========================================================================
+  // MESSAGE RENDERING - WITH XSS PROTECTION
+  // ===========================================================================
+  
+  /**
+   * Adds a message to the chat UI
+   * @param {string} text - Message text
+   * @param {string} sender - 'user' or 'bot'
+   * @param {boolean} save - Whether to save to history
+   */
+  addMessage(text, sender, save = true) {
     const messagesContainer = document.getElementById('chat-messages');
     if (!messagesContainer) return;
     
@@ -157,21 +213,28 @@ class ChatbotWidget {
     
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
+    // Use escapeHtml for safety - prevents XSS
     messageDiv.innerHTML = `
       ${avatarHtml}
       <div class="message-content">
         <p>${this.escapeHtml(text)}</p>
       </div>
-      <div class="message-time">${time}</div>
+      <div class="message-time">${this.escapeHtml(time)}</div>
     `;
     
     messagesContainer.appendChild(messageDiv);
     this.scrollToBottom();
     
     // Save to history
-    this.messageHistory.push({ text, sender, time });
-    this.saveChatHistory();
+    if (save) {
+      this.messageHistory.push({ text, sender, time });
+      this.saveChatHistory();
+    }
   }
+  
+  // ===========================================================================
+  // TYPING INDICATOR
+  // ===========================================================================
   
   showTyping() {
     const typingIndicator = document.getElementById('typing-indicator');
@@ -188,6 +251,10 @@ class ChatbotWidget {
     }
   }
   
+  // ===========================================================================
+  // UTILITY METHODS
+  // ===========================================================================
+  
   scrollToBottom() {
     const messagesContainer = document.getElementById('chat-messages');
     if (messagesContainer) {
@@ -203,26 +270,38 @@ class ChatbotWidget {
     }
   }
   
+  // ===========================================================================
+  // HISTORY MANAGEMENT
+  // ===========================================================================
+  
   saveChatHistory() {
-    // Keep last 50 messages
-    const historyToSave = this.messageHistory.slice(-50);
-    localStorage.setItem('chat_history', JSON.stringify(historyToSave));
+    try {
+      // Keep last 50 messages
+      const historyToSave = this.messageHistory.slice(-50);
+      localStorage.setItem('chat_history', JSON.stringify(historyToSave));
+    } catch (e) {
+      console.error('Failed to save chat history:', e);
+    }
   }
   
   loadChatHistory() {
-    const savedHistory = localStorage.getItem('chat_history');
-    if (savedHistory) {
-      try {
+    try {
+      const savedHistory = localStorage.getItem('chat_history');
+      if (savedHistory) {
         const history = JSON.parse(savedHistory);
         history.forEach(msg => {
           this.addMessage(msg.text, msg.sender, false);
         });
         this.messageHistory = history;
-      } catch (e) {
-        console.error('Failed to load chat history:', e);
       }
+    } catch (e) {
+      console.error('Failed to load chat history:', e);
     }
   }
+  
+  // ===========================================================================
+  // NOTIFICATION MANAGEMENT
+  // ===========================================================================
   
   updateUnreadCount(count = null) {
     if (count !== null) {
@@ -243,7 +322,17 @@ class ChatbotWidget {
     }
   }
   
+  // ===========================================================================
+  // XSS PREVENTION - HTML ESCAPING
+  // ===========================================================================
+  
+  /**
+   * Safely escapes HTML content to prevent XSS attacks
+   * @param {string} text - Text to escape
+   * @returns {string} Escaped HTML-safe text
+   */
   escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
