@@ -35,22 +35,67 @@ class AnalyticsTracker {
     this.setupAutoTracking();
   }
 
+  // ===========================================================================
+  // SECURE SESSION ID GENERATION - CRYPTOGRAPHICALLY SECURE
+  // ===========================================================================
+
   getOrCreateSessionId() {
     let sessionId = sessionStorage.getItem('analytics_session_id');
     if (!sessionId) {
-      sessionId = this.generateUUID();
+      sessionId = this.generateSecureSessionId();
       sessionStorage.setItem('analytics_session_id', sessionId);
     }
     return sessionId;
   }
 
-  generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+  /**
+   * Generates a cryptographically secure UUID v4-like identifier
+   * Uses crypto.randomUUID() if available, falls back to crypto.getRandomValues()
+   * @returns {string} Secure UUID v4-like string
+   */
+  generateSecureSessionId() {
+    // Option 1: Use crypto.randomUUID() (modern browsers)
+    if (window.crypto && window.crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    
+    // Option 2: Fallback to crypto.getRandomValues() (all modern browsers)
+    if (window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint8Array(16);
+      crypto.getRandomValues(array);
+      
+      // Set version (4) and variant (8, 9, A, or B)
+      array[6] = (array[6] & 0x0f) | 0x40;
+      array[8] = (array[8] & 0x3f) | 0x80;
+      
+      // Convert to hex string in UUID format
+      const hex = Array.from(array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      return hex.substr(0, 8) + '-' + hex.substr(8, 4) + '-' + 
+             hex.substr(12, 4) + '-' + hex.substr(16, 4) + '-' + 
+             hex.substr(20, 12);
+    }
+    
+    // Option 3: Last resort fallback (should never happen in modern browsers)
+    console.warn('Crypto API not available for session ID generation');
+    return this.generateFallbackId();
   }
+
+  /**
+   * Fallback ID generator - only used when crypto is unavailable
+   * @returns {string} Fallback ID
+   */
+  generateFallbackId() {
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substr(2, 9);
+    return timestamp + '-' + random;
+  }
+
+  // ===========================================================================
+  // EVENT TRACKING
+  // ===========================================================================
 
   async trackEvent(eventType, eventData = {}) {
     if (!this.trackingEnabled) return;
@@ -140,6 +185,10 @@ class AnalyticsTracker {
     });
   }
 
+  // ===========================================================================
+  // EVENT FLUSHING
+  // ===========================================================================
+
   async flushEvents(sync = false) {
     if (this.eventsQueue.length === 0) return;
     
@@ -163,26 +212,47 @@ class AnalyticsTracker {
     try {
       if (sync) {
         // Use sendBeacon for page unload events
-        const blob = new Blob([JSON.stringify({ events: events })], { type: 'application/json' });
-        navigator.sendBeacon('/api/v1/analytics/batch', blob);
+        const blob = new Blob([JSON.stringify({ events: events })], { 
+          type: 'application/json' 
+        });
+        const sent = navigator.sendBeacon('/api/v1/analytics/batch', blob);
+        if (!sent) {
+          // If sendBeacon fails, fallback to fetch
+          await fetch('/api/v1/analytics/batch', fetchOptions);
+        }
       } else {
-        await fetch('/api/v1/analytics/batch', fetchOptions);
+        const response = await fetch('/api/v1/analytics/batch', fetchOptions);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       }
     } catch (error) {
       console.error('Failed to send analytics events:', error);
-      // Re-add events to queue for retry
-      this.eventsQueue.unshift(...events);
+      // Re-add events to queue for retry (limit to prevent infinite growth)
+      if (this.eventsQueue.length < 100) {
+        this.eventsQueue.unshift(...events);
+      } else {
+        console.warn('Analytics queue overflow, dropping events');
+      }
     }
   }
+
+  // ===========================================================================
+  // AUTO TRACKING
+  // ===========================================================================
 
   setupAutoTracking() {
     // Track outbound links
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a');
       if (link && link.href) {
-        const url = new URL(link.href);
-        if (url.hostname !== window.location.hostname) {
-          this.trackOutboundLink(link.href);
+        try {
+          const url = new URL(link.href);
+          if (url.hostname !== window.location.hostname) {
+            this.trackOutboundLink(link.href);
+          }
+        } catch {
+          // Invalid URL, skip
         }
       }
     });
@@ -193,15 +263,19 @@ class AnalyticsTracker {
       if (link && link.href) {
         const fileExtensions = ['.pdf', '.epub', '.mobi', '.zip', '.csv', '.xlsx'];
         if (fileExtensions.some(ext => link.href.toLowerCase().endsWith(ext))) {
-          this.trackDownload(link.href, getFileExtension(link.href));
+          const fileType = link.href.split('.').pop() || 'unknown';
+          this.trackDownload(link.href, fileType);
         }
       }
     });
     
     // Track scroll depth
     let maxScrollDepth = 0;
-    const scrollHandler = throttle(() => {
-      const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    const scrollHandler = this.throttle(() => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight <= 0) return;
+      
+      const scrollPercent = (window.scrollY / scrollHeight) * 100;
       if (scrollPercent > maxScrollDepth + 25) {
         maxScrollDepth = Math.floor(scrollPercent / 25) * 25;
         this.trackEvent('scroll_depth', { depth: maxScrollDepth });
@@ -220,6 +294,27 @@ class AnalyticsTracker {
     });
   }
 
+  // ===========================================================================
+  // UTILITY METHODS
+  // ===========================================================================
+
+  /**
+   * Throttle function to limit event frequency
+   * @param {Function} fn - Function to throttle
+   * @param {number} delay - Throttle delay in milliseconds
+   * @returns {Function} Throttled function
+   */
+  throttle(fn, delay) {
+    let lastCall = 0;
+    return function(...args) {
+      const now = Date.now();
+      if (now - lastCall >= delay) {
+        lastCall = now;
+        fn.apply(this, args);
+      }
+    };
+  }
+
   async getUserCohort() {
     // Determine user cohort based on signup date
     const token = localStorage.getItem('access_token');
@@ -229,6 +324,11 @@ class AnalyticsTracker {
       const response = await fetch('/api/v1/users/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success && data.data?.created_at) {
@@ -240,6 +340,27 @@ class AnalyticsTracker {
       console.error('Failed to get user cohort:', error);
     }
     return null;
+  }
+
+  /**
+   * Clean up resources when analytics is destroyed
+   */
+  destroy() {
+    if (this.flushInterval) {
+      clearInterval(this.flushInterval);
+      this.flushInterval = null;
+    }
+    this.flushEvents(true);
+  }
+}
+
+// Helper function to get file extension
+function getFileExtension(url) {
+  try {
+    const parts = url.split('.');
+    return parts.length > 1 ? parts.pop() || 'unknown' : 'unknown';
+  } catch {
+    return 'unknown';
   }
 }
 
