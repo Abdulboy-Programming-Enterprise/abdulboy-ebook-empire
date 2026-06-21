@@ -4,7 +4,7 @@ Application Factory
 Creates and configures the FastAPI application instance.
 """
 
-from app import create_app
+from . import create_app
 
 # Create global app instance
 app = create_app()
