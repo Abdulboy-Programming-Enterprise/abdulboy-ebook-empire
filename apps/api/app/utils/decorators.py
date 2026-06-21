@@ -115,24 +115,23 @@ def retry_on_failure(max_retries: int = 3, delay: float = 1.0, backoff: float = 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
-            last_exception = None
             current_delay = delay
             
             for attempt in range(max_retries + 1):
                 try:
                     return await func(*args, **kwargs)
                 except Exception as e:
-                    last_exception = e
                     if attempt == max_retries:
-                        break
+                        logger.error(
+                            f"All {max_retries} retries failed for {func.__name__}: {e}"
+                        )
+                        raise
                     
                     logger.warning(
                         f"Retry {attempt + 1}/{max_retries} for {func.__name__}: {e}"
                     )
                     await asyncio.sleep(current_delay)
                     current_delay *= backoff
-            
-            raise last_exception
         
         @wraps(func)
         def sync_wrapper(*args, **kwargs):
@@ -140,24 +139,23 @@ def retry_on_failure(max_retries: int = 3, delay: float = 1.0, backoff: float = 
             if inspect.iscoroutinefunction(func):
                 return async_wrapper(*args, **kwargs)
             
-            last_exception = None
             current_delay = delay
             
             for attempt in range(max_retries + 1):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    last_exception = e
                     if attempt == max_retries:
-                        break
+                        logger.error(
+                            f"All {max_retries} retries failed for {func.__name__}: {e}"
+                        )
+                        raise
                     
                     logger.warning(
                         f"Retry {attempt + 1}/{max_retries} for {func.__name__}: {e}"
                     )
                     time.sleep(current_delay)
                     current_delay *= backoff
-            
-            raise last_exception
         
         return sync_wrapper
     return decorator
