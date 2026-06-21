@@ -397,6 +397,10 @@
 
 <script>
 (function() {
+  // ===========================================================================
+  // DOM References
+  // ===========================================================================
+  
   const toggleBtn = document.getElementById('chat-toggle-btn');
   const chatWindow = document.getElementById('chat-window');
   const minimizeBtn = document.getElementById('chat-minimize-btn');
@@ -410,27 +414,92 @@
   let isOpen = false;
   let messageCount = 0;
   
-  // Load chat history from localStorage
+  // ===========================================================================
+  // SECURE SESSION ID GENERATION - CRYPTOGRAPHICALLY SECURE
+  // ===========================================================================
+  
+  /**
+   * Generates a cryptographically secure session ID
+   * Uses crypto.randomUUID() if available, falls back to crypto.getRandomValues()
+   * @returns {string} Secure session ID
+   */
+  function generateSessionId() {
+    // Option 1: Use crypto.randomUUID() (modern browsers, Node.js 14+)
+    if (window.crypto && window.crypto.randomUUID) {
+      return 'chat_' + crypto.randomUUID();
+    }
+    
+    // Option 2: Fallback to crypto.getRandomValues() (all modern browsers)
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    
+    return 'chat_' + Array.from(array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+  }
+  
+  // ===========================================================================
+  // HTML SANITIZATION - PREVENT XSS
+  // ===========================================================================
+  
+  /**
+   * Safely escapes HTML content to prevent XSS attacks
+   * @param {string} text - Text to escape
+   * @returns {string} Escaped HTML-safe text
+   */
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // ===========================================================================
+  // CHAT HISTORY MANAGEMENT
+  // ===========================================================================
+  
+  /**
+   * Loads chat history from localStorage
+   */
   function loadChatHistory() {
-    const history = localStorage.getItem('chat_history');
-    if (history) {
-      const messages = JSON.parse(history);
-      messages.forEach(msg => addMessageToUI(msg.text, msg.type, false));
+    try {
+      const history = localStorage.getItem('chat_history');
+      if (history) {
+        const messages = JSON.parse(history);
+        messages.forEach(msg => addMessageToUI(msg.text, msg.type, false));
+      }
+    } catch (e) {
+      console.error('Failed to load chat history:', e);
     }
   }
   
-  // Save chat history
+  /**
+   * Saves chat history to localStorage (keeps last 50 messages)
+   */
   function saveChatHistory() {
-    const messages = [];
-    document.querySelectorAll('.message').forEach(msg => {
-      const isUser = msg.classList.contains('user-message');
-      const text = msg.querySelector('.message-content p')?.innerText || '';
-      messages.push({ text, type: isUser ? 'user' : 'bot' });
-    });
-    localStorage.setItem('chat_history', JSON.stringify(messages.slice(-50))); // Keep last 50
+    try {
+      const messages = [];
+      document.querySelectorAll('.message').forEach(msg => {
+        const isUser = msg.classList.contains('user-message');
+        const text = msg.querySelector('.message-content p')?.textContent || '';
+        messages.push({ text, type: isUser ? 'user' : 'bot' });
+      });
+      localStorage.setItem('chat_history', JSON.stringify(messages.slice(-50)));
+    } catch (e) {
+      console.error('Failed to save chat history:', e);
+    }
   }
   
-  // Add message to UI
+  // ===========================================================================
+  // MESSAGE RENDERING
+  // ===========================================================================
+  
+  /**
+   * Adds a message to the chat UI
+   * @param {string} text - Message text
+   * @param {string} type - 'user' or 'bot'
+   * @param {boolean} save - Whether to save to history
+   */
   function addMessageToUI(text, type, save = true) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type === 'user' ? 'user-message' : 'bot-message'}`;
@@ -439,12 +508,15 @@
       ? `<div class="message-avatar"><img src="/images/logo/logo-icon.svg" alt="Bot"></div>`
       : `<div class="message-avatar"><img src="/images/default-avatar.png" alt="User"></div>`;
     
+    // Use escapeHtml for safety - prevents XSS
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
     messageDiv.innerHTML = `
       ${avatarHtml}
       <div class="message-content">
         <p>${escapeHtml(text)}</p>
       </div>
-      <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      <div class="message-time">${escapeHtml(time)}</div>
     `;
     
     messagesContainer.appendChild(messageDiv);
@@ -455,44 +527,59 @@
     }
   }
   
-  // Escape HTML to prevent XSS
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+  // ===========================================================================
+  // TYPING INDICATOR
+  // ===========================================================================
   
-  // Show typing indicator
   function showTyping() {
     typingIndicator.style.display = 'flex';
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
   
-  // Hide typing indicator
   function hideTyping() {
     typingIndicator.style.display = 'none';
   }
   
-  // Send message to backend
+  // ===========================================================================
+  // MESSAGE SENDING
+  // ===========================================================================
+  
+  /**
+   * Sends a message to the backend API
+   * @param {string} message - User's message
+   */
   async function sendMessage(message) {
+    // Add user message to UI
     addMessageToUI(message, 'user');
     chatInput.value = '';
     showTyping();
     
     try {
+      // Get or create secure session ID
+      const sessionId = localStorage.getItem('chat_session_id') || generateSessionId();
+      
       const response = await fetch('/api/v1/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, session_id: localStorage.getItem('chat_session_id') || generateSessionId() })
+        body: JSON.stringify({ message, session_id: sessionId })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       hideTyping();
-      addMessageToUI(data.reply, 'bot');
+      
+      // Add bot response
+      const reply = data.reply || 'I received your message!';
+      addMessageToUI(reply, 'bot');
       
       // Save session ID
       if (data.session_id) {
         localStorage.setItem('chat_session_id', data.session_id);
+      } else {
+        localStorage.setItem('chat_session_id', sessionId);
       }
       
       // Update notification badge if window is minimized
@@ -503,16 +590,16 @@
       }
     } catch (error) {
       hideTyping();
-      addMessageToUI('Sorry, I\'m having trouble connecting. Please try again later.', 'bot');
       console.error('Chat error:', error);
+      addMessageToUI('Sorry, I\'m having trouble connecting. Please try again later.', 'bot');
     }
   }
   
-  function generateSessionId() {
-    return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
+  // ===========================================================================
+  // EVENT LISTENERS
+  // ===========================================================================
   
-  // Event Listeners
+  // Toggle chat window
   toggleBtn?.addEventListener('click', () => {
     isOpen = !isOpen;
     chatWindow.style.display = isOpen ? 'flex' : 'none';
@@ -531,6 +618,7 @@
     }
   });
   
+  // Minimize chat
   minimizeBtn?.addEventListener('click', () => {
     isOpen = false;
     chatWindow.style.display = 'none';
@@ -540,6 +628,7 @@
     closeIcon.style.display = 'none';
   });
   
+  // Send button click
   sendBtn?.addEventListener('click', () => {
     const message = chatInput.value.trim();
     if (message) {
@@ -547,6 +636,7 @@
     }
   });
   
+  // Enter key to send (Shift+Enter for new line)
   chatInput?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -557,10 +647,13 @@
     }
   });
   
+  // Quick reply buttons
   quickReplies?.forEach(btn => {
     btn.addEventListener('click', () => {
       const query = btn.dataset.query;
-      sendMessage(query);
+      if (query) {
+        sendMessage(query);
+      }
     });
   });
   
@@ -570,7 +663,10 @@
     this.style.height = Math.min(this.scrollHeight, 100) + 'px';
   });
   
-  // Load history on init
+  // ===========================================================================
+  // INITIALIZATION
+  // ===========================================================================
+  
   loadChatHistory();
 })();
 </script>
