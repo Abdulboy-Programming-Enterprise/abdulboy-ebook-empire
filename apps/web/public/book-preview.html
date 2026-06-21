@@ -10,8 +10,10 @@
 </head>
 <body>
   <div id="header-placeholder"></div>
+  
   <main id="reader-container" class="reader-container">
     <div class="reader-loading" id="reader-loading">Loading book...</div>
+    
     <div class="reader-toolbar">
       <button id="prev-page" class="toolbar-btn">← Prev</button>
       <span>Page <span id="current-page">1</span> of <span id="total-pages">0</span></span>
@@ -20,10 +22,16 @@
       <button id="zoom-out" class="toolbar-btn">Zoom -</button>
       <button id="fullscreen-mode" class="toolbar-btn">Fullscreen</button>
     </div>
+    
     <div id="pdf-viewer" class="pdf-viewer"></div>
   </main>
+  
   <div id="footer-placeholder"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" 
+    integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e" 
+    crossorigin="anonymous">
+  </script>
+  
   <script src="/scripts/book-reader.js"></script>
 </body>
 </html>
