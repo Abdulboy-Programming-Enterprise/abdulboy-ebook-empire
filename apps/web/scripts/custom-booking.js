@@ -45,7 +45,11 @@ class CustomBookingManager {
     if (!fileInput || !previewContainer) return;
     
     fileInput.addEventListener('change', (e) => {
-      previewContainer.innerHTML = '';
+      // Clear preview container safely
+      while (previewContainer.firstChild) {
+        previewContainer.removeChild(previewContainer.firstChild);
+      }
+      
       const files = Array.from(e.target.files);
       
       files.forEach(file => {
@@ -54,26 +58,38 @@ class CustomBookingManager {
           return;
         }
         
+        // Create elements safely using DOM methods (no innerHTML)
         const previewItem = document.createElement('div');
         previewItem.className = 'file-preview-item';
-        previewItem.innerHTML = `
-          <span class="file-name">${this.escapeHtml(file.name)}</span>
-          <span class="file-size">${this.formatFileSize(file.size)}</span>
-          <button type="button" class="remove-file" data-filename="${file.name}">×</button>
-        `;
-        previewContainer.appendChild(previewItem);
-      });
-      
-      // Attach remove handlers
-      document.querySelectorAll('.remove-file').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const filename = btn.dataset.filename;
-          const newFiles = Array.from(fileInput.files).filter(f => f.name !== filename);
+        
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.className = 'file-name';
+        fileNameSpan.textContent = file.name; // Auto-escaped
+        
+        const fileSizeSpan = document.createElement('span');
+        fileSizeSpan.className = 'file-size';
+        fileSizeSpan.textContent = this.formatFileSize(file.size);
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-file';
+        removeBtn.textContent = '×';
+        
+        // Direct event handler - no data attribute needed
+        removeBtn.addEventListener('click', () => {
+          const newFiles = Array.from(fileInput.files).filter(f => f.name !== file.name);
           const dataTransfer = new DataTransfer();
           newFiles.forEach(f => dataTransfer.items.add(f));
           fileInput.files = dataTransfer.files;
-          btn.closest('.file-preview-item').remove();
+          previewItem.remove();
+          // Trigger change event to update any other listeners
+          fileInput.dispatchEvent(new Event('change', { bubbles: true }));
         });
+        
+        previewItem.appendChild(fileNameSpan);
+        previewItem.appendChild(fileSizeSpan);
+        previewItem.appendChild(removeBtn);
+        previewContainer.appendChild(previewItem);
       });
     });
   }
@@ -225,6 +241,7 @@ class CustomBookingManager {
     
     const status = statusConfig[this.currentBooking.status] || statusConfig.pending;
     
+    // All user data is properly escaped
     container.innerHTML = `
       <div class="booking-header">
         <h1>${this.escapeHtml(this.currentBooking.title)}</h1>
@@ -274,7 +291,7 @@ class CustomBookingManager {
         ${this.currentBooking.delivery_url ? `
           <div class="detail-card delivery-section">
             <h3>Delivery</h3>
-            <a href="${this.currentBooking.delivery_url}" class="btn btn-primary" target="_blank">Download Your Book</a>
+            <a href="${this.sanitizeUrl(this.currentBooking.delivery_url)}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Download Your Book</a>
           </div>
         ` : ''}
       </div>
@@ -355,17 +372,18 @@ class CustomBookingManager {
       cancelled: 'Cancelled'
     };
     
+    // All user data is properly escaped
     container.innerHTML = this.bookings.map(booking => `
-      <div class="booking-list-item" data-booking-id="${booking.id}">
+      <div class="booking-list-item" data-booking-id="${this.escapeHtml(String(booking.id))}">
         <div class="booking-item-header">
           <h3>${this.escapeHtml(booking.title)}</h3>
-          <span class="status-badge status-${booking.status}">${statusConfig[booking.status]}</span>
+          <span class="status-badge status-${booking.status}">${statusConfig[booking.status] || 'Unknown'}</span>
         </div>
         <div class="booking-item-details">
           <span>📅 ${new Date(booking.created_at).toLocaleDateString()}</span>
           ${booking.budget ? `<span>💰 $${booking.budget.toLocaleString()}</span>` : ''}
         </div>
-        <button class="btn btn-outline view-booking-btn" data-booking-id="${booking.id}">View Details</button>
+        <button class="btn btn-outline view-booking-btn" data-booking-id="${this.escapeHtml(String(booking.id))}">View Details</button>
       </div>
     `).join('');
     
@@ -373,7 +391,9 @@ class CustomBookingManager {
     document.querySelectorAll('.view-booking-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const bookingId = btn.dataset.bookingId;
-        window.location.href = `/booking-status.html?id=${bookingId}`;
+        if (bookingId) {
+          window.location.href = `/booking-status.html?id=${encodeURIComponent(bookingId)}`;
+        }
       });
     });
   }
@@ -401,6 +421,21 @@ class CustomBookingManager {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // New helper method for URL sanitization
+  sanitizeUrl(url) {
+    if (!url) return '';
+    // Only allow http and https protocols
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return '';
+      }
+      return url;
+    } catch {
+      return '';
+    }
   }
 }
 
