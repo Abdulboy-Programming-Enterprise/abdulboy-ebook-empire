@@ -45,7 +45,7 @@ PyPDF2==3.0.1
 reportlab==4.0.4
 
 # Image Processing
-Pillow==12.2.0
+Pillow==12.3.0
 
 # Templates
 jinja2==3.1.6
